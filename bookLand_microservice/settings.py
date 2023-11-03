@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
 
     'users.apps.UsersConfig',
+    'books.apps.BooksConfig',
 
     "rest_framework",
     "drf_spectacular",
@@ -95,7 +97,7 @@ DATABASES = {
         'NAME': 'BookLandDB',
         'USER': 'admin',
         'PASSWORD': 'password',
-        'HOST': 'localhost',
+        'HOST': 'localhost',  # When running in docker set it to postgres-db
         'PORT': '5432',
         'OPTIONS': {
             'options': '-c search_path=your_predefined_schema'
@@ -158,3 +160,10 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     # OTHER SETTINGS
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config('EMAIL')
+EMAIL_HOST_PASSWORD = config('EMAIL_PASSWORD')
