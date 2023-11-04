@@ -1,0 +1,8 @@
+# Ignore .env file
+.env
+
+# Ignore Python bytecode files and directories
+__pycache__
+db-data
+*.pyc
+.idea

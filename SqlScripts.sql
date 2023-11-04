@@ -4,11 +4,9 @@ CREATE TABLE Users (
     Username VARCHAR(255) UNIQUE,
     Email VARCHAR(255) UNIQUE,
     HashedPassword TEXT NOT NULL,
-    ActivationCode TEXT,
-    ExpireDate DATE,
     IsActive BOOLEAN NOT NULL,
-    RegistrationDate DATE NOT NULL,
-    LastLoginDate DATE,
+    RegistrationDate TIMESTAMP NOT NULL,
+    LastLoginDate TIMESTAMP,
     IsPublisher BOOLEAN NOT NULL,
     PhoneNumber VARCHAR(20) UNIQUE,
     PhoneNumber2 VARCHAR(20),
@@ -18,6 +16,14 @@ CREATE TABLE Users (
     PublicationsName VARCHAR(255) UNIQUE,
     PublicationsImage TEXT,
     IsConfirm BOOLEAN NOT NULL
+);
+
+CREATE TABLE UserActivityCodes (
+    Id SERIAL PRIMARY KEY,
+    Email VARCHAR(255),
+    ActivationCode VARCHAR(6),
+    CreatedDateTime TIMESTAMP,
+    ExpireDateTime TIMESTAMP
 );
 
 -- Role table
@@ -100,7 +106,7 @@ CREATE TABLE Comments (
     UserId INTEGER REFERENCES Users(Id),
     Comment TEXT,
     IsDelete BOOLEAN,
-    CreatedDate DATE
+    CreatedDate TIMESTAMP
 );
 
 -- Category table
@@ -131,7 +137,7 @@ CREATE TABLE WalletActions (
     Amount DECIMAL(10,2),
     IsSuccessful BOOLEAN,
     Description TEXT,
-    CreatedDate DATE
+    CreatedDate TIMESTAMP
 );
 
 -- Discount table
@@ -140,8 +146,8 @@ CREATE TABLE Discounts (
     Code VARCHAR(255) UNIQUE,
     Quantity INTEGER,
     Percent DECIMAL(4,2),
-    CreatedDate DATE,
-    ExpireDate DATE,
+    CreatedDate TIMESTAMP,
+    ExpireDate TIMESTAMP,
     IsDelete BOOLEAN
 );
 
