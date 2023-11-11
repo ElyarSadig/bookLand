@@ -10,5 +10,5 @@ urlpatterns = [
     path("auth/verify-email-code", VerifyEmailCodeView.as_view(), name="verify-code-email"),
     path("auth/send-resetpassword-code", SendPasswordResetCodeView.as_view(), name="password-reset-code"),
     path("auth/reset-password", PasswordResetView.as_view(), name="reset-password"),
-    path("auth/publisher/signup", PublisherSignUpView, name="publisher-signup"),
+    path("auth/publisher/signup", PublisherSignUpView.as_view(), name="publisher-signup"),
 ]
