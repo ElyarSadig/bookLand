@@ -36,7 +36,8 @@ def upload_to_file_server(file_path, postfix):
     with open(file_path, 'rb') as file:
         files = {'file': (file_name, file)}
 
-        response = requests.post(file_server_url + postfix, files=files, headers={'Authorization': auth_token})
+        response = requests.post(file_server_url + postfix, files=files, headers={'Authorization': auth_token},
+                                 timeout=0.5)
 
         if response.status_code == 200:
             return file_name  # Return the file name
