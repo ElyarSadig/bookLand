@@ -28,6 +28,20 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
+}
+
 # trusted domains
 CORS_ORIGIN_WHITELIST = (
     "http://localhost:3000",
@@ -97,7 +111,7 @@ DATABASES = {
         'NAME': 'BookLandDB',
         'USER': 'admin',
         'PASSWORD': 'password',
-        'HOST': 'localhost',  # When running in docker set it to postgres-db
+        'HOST': config('DB_HOST', default='localhost'),
         'PORT': '5432',
         'OPTIONS': {
             'options': '-c search_path=your_predefined_schema'
@@ -152,6 +166,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    'EXCEPTION_HANDLER': 'bookLand_microservice.exceptions.custom_exception_handler',
 }
 
 SPECTACULAR_SETTINGS = {
