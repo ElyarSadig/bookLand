@@ -43,7 +43,7 @@ def custom_exception_handler(exc, context):
     logging.exception("An exception occurred:")
     traceback.print_exc()
 
-    return error_response(response, error_code="UnknownError", error_message="خطایی در سرور رخ داده است",
+    return error_response(response, error_code=type(exc).__name__, error_message="خطایی در سرور رخ داده است",
                           status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
