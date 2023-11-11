@@ -13,8 +13,8 @@ class UserSignUpSerializer(serializers.Serializer):
         if not is_username_valid(attrs["username"]):
             raise serializers.ValidationError({
                 "result": {
-                    "errorCode": "InvalidUsername",
-                    "errorMessage": "نام کاربری نا معتبر",
+                    "error_code": "InvalidUsername",
+                    "error_message": "نام کاربری نا معتبر",
                     "errors": ""
                 },
                 "data": "",
@@ -23,8 +23,8 @@ class UserSignUpSerializer(serializers.Serializer):
         if not is_email_valid(attrs["email"]):
             raise serializers.ValidationError({
                 "result": {
-                    "errorCode": "InvalidEmail",
-                    "errorMessage": "ایمیل نامعتبر",
+                    "error_code": "InvalidEmail",
+                    "error_message": "ایمیل نامعتبر",
                     "errors": ""
                 },
                 "data": "",
@@ -33,8 +33,8 @@ class UserSignUpSerializer(serializers.Serializer):
         if not password_match(attrs["password"], attrs["password2"]):
             raise serializers.ValidationError({
                 "result": {
-                    "errorCode": "PasswordsDoNotMatch",
-                    "errorMessage": "پسورد مطابقت ندارد",
+                    "error_code": "PasswordsDoNotMatch",
+                    "error_message": "پسورد مطابقت ندارد",
                     "errors": ""
                 },
                 "data": "",
@@ -60,8 +60,8 @@ class PublisherSignUpSerializer(serializers.Serializer):
         if not is_username_valid(attrs["username"]):
             raise serializers.ValidationError({
                 "result": {
-                    "errorCode": "InvalidUsername",
-                    "errorMessage": "نام کاربری نا معتبر",
+                    "error_code": "InvalidUsername",
+                    "error_message": "نام کاربری نا معتبر",
                     "errors": ""
                 },
                 "data": "",
@@ -70,8 +70,8 @@ class PublisherSignUpSerializer(serializers.Serializer):
         if not is_email_valid(attrs["email"]):
             raise serializers.ValidationError({
                 "result": {
-                    "errorCode": "InvalidEmail",
-                    "errorMessage": "ایمیل نامعتبر",
+                    "error_code": "InvalidEmail",
+                    "error_message": "ایمیل نامعتبر",
                     "errors": ""
                 },
                 "data": "",
@@ -80,8 +80,8 @@ class PublisherSignUpSerializer(serializers.Serializer):
         if not password_match(attrs["password"], attrs["password2"]):
             raise serializers.ValidationError({
                 "result": {
-                    "errorCode": "PasswordsDoNotMatch",
-                    "errorMessage": "پسورد مطابقت ندارد",
+                    "error_code": "PasswordsDoNotMatch",
+                    "error_message": "پسورد مطابقت ندارد",
                     "errors": ""
                 },
                 "data": "",
@@ -90,8 +90,8 @@ class PublisherSignUpSerializer(serializers.Serializer):
         if not validate_iranian_phone_number(attrs["phone_number"]):
             raise serializers.ValidationError({
                 "result": {
-                    "errorCode": "InvalidPhoneNumber",
-                    "errorMessage": "شماره تلفن معتبر نمی باشد",
+                    "error_code": "InvalidPhoneNumber",
+                    "error_message": "شماره تلفن معتبر نمی باشد",
                     "errors": ""
                 },
                 "data": "",
@@ -112,8 +112,8 @@ class LoginSerializer(serializers.Serializer):
         if email and not is_email_valid(email):
             raise serializers.ValidationError({
                 "result": {
-                    "errorCode": "InvalidEmail",
-                    "errorMessage": "ایمیل نامعتبر",
+                    "error_code": "InvalidEmail",
+                    "error_message": "ایمیل نامعتبر",
                     "errors": ""
                 },
                 "data": "",
@@ -141,8 +141,8 @@ class VerifyEmailCodeSerializer(serializers.Serializer):
         if len(attrs['activation_code']) != 6:
             raise serializers.ValidationError({
                 "result": {
-                    "errorCode": "InvalidActivationCode",
-                    "errorMessage": "کد نامعتبر",
+                    "error_code": "InvalidActivationCode",
+                    "error_message": "کد نامعتبر",
                     "errors": ""
                 },
                 "data": "",
@@ -162,8 +162,8 @@ class ResetPasswordSerializer(serializers.Serializer):
         if not password_match(attrs["password"], attrs["password2"]):
             raise serializers.ValidationError({
                 "result": {
-                    "errorCode": "PasswordsDoNotMatch",
-                    "errorMessage": "پسورد مطابقت ندارد",
+                    "error_code": "PasswordsDoNotMatch",
+                    "error_message": "پسورد مطابقت ندارد",
                     "errors": ""
                 },
                 "data": "",
