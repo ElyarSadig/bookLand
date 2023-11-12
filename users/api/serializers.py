@@ -101,29 +101,24 @@ class PublisherSignUpSerializer(serializers.Serializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(required=False, max_length=150)
-    email = serializers.CharField(required=False, max_length=150)
+    email_or_username = serializers.CharField(max_length=150)
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        username = attrs.get("username")
-        email = attrs.get("email")
+        email_or_username = attrs["email_or_username"]
 
-        if email and not is_email_valid(email):
-            raise serializers.ValidationError({
-                "result": {
-                    "error_code": "InvalidEmail",
-                    "error_message": "ایمیل نامعتبر",
-                    "errors": ""
-                },
-                "data": "",
-            })
+        if not is_email_valid(email_or_username):
 
-        if not (username or email):
-            raise serializers.ValidationError("You must provide either a username or an email.")
+            if not is_username_valid(email_or_username):
 
-        if username and email:
-            raise serializers.ValidationError("You can't provide both a username and an email. Choose one.")
+                raise serializers.ValidationError({
+                    "result": {
+                        "error_code": "InvalidCredentials",
+                        "error_message": "ایمیل نام کاربری نامعتبر",
+                        "errors": ""
+                    },
+                    "data": "",
+                })
 
         return attrs
 
