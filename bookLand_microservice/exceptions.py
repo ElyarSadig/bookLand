@@ -1,4 +1,3 @@
-from rest_framework.views import exception_handler
 import traceback
 from django.db import ProgrammingError, InternalError, IntegrityError, OperationalError
 from rest_framework.response import Response
@@ -6,6 +5,7 @@ from rest_framework import status
 from users.api.api_result import APIResult
 import logging
 from users.api.exceptions import *
+from accounts.api.exceptions import *
 
 
 def custom_exception_handler(exc, context):
@@ -23,24 +23,32 @@ def custom_exception_handler(exc, context):
         InvalidCodeError: "کد وارد شده نا معتبر است",
         InvalidFileFormatError: "فایل نامعتبر",
 
+        InvalidTokenError: "توکن نامعتبر",
+        MissingTokenError: "توکن وجود ندارد",
+        ExpiredSignatureError: "توکن منقضی شده است",
+
         FileUploadFailedError: "خطایی هنگام آپلود فایل در سیستم رخ داد",
         ProgrammingError: "An error occurred while running the cursor",
         IntegrityError: "خطایی در اعتبارسنجی داده‌ها رخ داده است",
         InternalError: "خطایی در پایگاه داده رخ داده است",
     }
 
+    authorization_exceptions = (InvalidTokenError, MissingTokenError, ExpiredSignatureError)
+
+    internal_exceptions = (ProgrammingError, IntegrityError, InternalError, FileUploadFailedError)
+
     for exception_type, error_message in known_exceptions.items():
         if isinstance(exc, exception_type):
 
-            logging.exception(exc)
-
-            if isinstance(exc, (ProgrammingError, IntegrityError, InternalError, FileUploadFailedError)):
+            if isinstance(exc, internal_exceptions):
                 status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+            if isinstance(exc, authorization_exceptions):
+                status_code = status.HTTP_401_UNAUTHORIZED
 
             return error_response(response, error_code=exception_type.__name__, error_message=error_message,
                                   status_code=status_code)
 
-    logging.exception("An exception occurred:")
     traceback.print_exc()
 
     return error_response(response, error_code=type(exc).__name__, error_message="خطایی در سرور رخ داده است",
