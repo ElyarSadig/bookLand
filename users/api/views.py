@@ -59,10 +59,10 @@ class UserSignUpView(GenericAPIView):
             password = serializer.validated_data['password']
 
             if UserManagementDBUtils.username_exists(username):
-                raise UsernameAlreadyExistsError
+                raise UsernameAlreadyExistsError()
 
             if UserManagementDBUtils.email_exists(email):
-                raise EmailAlreadyExistsError
+                raise EmailAlreadyExistsError()
 
             user_id = UserManagementDBUtils.create_user(username, email, password)
 
