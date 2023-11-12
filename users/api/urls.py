@@ -4,11 +4,11 @@ from users.api.views import UserSignUpView, UserLoginView, SendSignUpEmailView, 
 
 
 urlpatterns = [
-    path("auth/user/signup", UserSignUpView.as_view(), name="user-signup"),
-    path("auth/login", UserLoginView.as_view(), name="login"),
-    path("auth/send-signup-email", SendSignUpEmailView.as_view(), name="send-email"),
-    path("auth/verify-email-code", VerifyEmailCodeView.as_view(), name="verify-code-email"),
-    path("auth/send-resetpassword-code", SendPasswordResetCodeView.as_view(), name="password-reset-code"),
-    path("auth/reset-password", PasswordResetView.as_view(), name="reset-password"),
-    path("auth/publisher/signup", PublisherSignUpView.as_view(), name="publisher-signup"),
+    path("user/signup", UserSignUpView.as_view(), name="user-signup"),
+    path("login", UserLoginView.as_view(), name="login"),
+    path("send-signup-email", SendSignUpEmailView.as_view(), name="send-email"),
+    path("verify-email-code", VerifyEmailCodeView.as_view(), name="verify-code-email"),
+    path("send-resetpassword-code", SendPasswordResetCodeView.as_view(), name="password-reset-code"),
+    path("reset-password", PasswordResetView.as_view(), name="reset-password"),
+    path("publisher/signup", PublisherSignUpView.as_view(), name="publisher-signup"),
 ]
