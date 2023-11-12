@@ -82,12 +82,7 @@ class UserLoginView(GenericAPIView):
 
         if serializer.is_valid():
 
-            identifier = ""
-            if 'username' in serializer.validated_data:
-                identifier = serializer.validated_data['username']
-
-            elif 'email' in serializer.validated_data:
-                identifier = serializer.validated_data['email']
+            identifier = serializer.validated_data['email_or_username']
 
             password = serializer.validated_data['password']
 
@@ -218,5 +213,3 @@ class PasswordResetView(GenericAPIView):
             return Response(response.api_result, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
