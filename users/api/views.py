@@ -41,6 +41,10 @@ class PublisherSignUpView(GenericAPIView):
 
             UserRoleDBUtils.assign_user_role(user_id, role_id=2)
 
+            token = generate_jwt_token(user_id, role_id=2)
+
+            response.api_result['data'] = token
+
             return Response(response.api_result, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -67,6 +71,10 @@ class UserSignUpView(GenericAPIView):
             user_id = UserManagementDBUtils.create_user(username, email, password)
 
             UserRoleDBUtils.assign_user_role(user_id, 3)
+
+            token = generate_jwt_token(user_id, role_id=3)
+
+            response.api_result['data'] = token
 
             return Response(response.api_result, status=status.HTTP_201_CREATED)
 
