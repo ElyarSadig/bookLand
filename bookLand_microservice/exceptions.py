@@ -49,7 +49,7 @@ def custom_exception_handler(exc, context):
             return error_response(response, error_code=exception_type.__name__, error_message=error_message,
                                   status_code=status_code)
 
-    traceback.print_exc()
+        traceback.print_exc()
 
     return error_response(response, error_code=type(exc).__name__, error_message="خطایی در سرور رخ داده است",
                           status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
