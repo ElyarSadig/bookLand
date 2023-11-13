@@ -50,9 +50,9 @@ class PublisherSignUpSerializer(serializers.Serializer):
     password2 = serializers.CharField(write_only=True)
     phone_number = serializers.CharField(max_length=20)
     publications_name = serializers.CharField(max_length=200)
-    publications_image = serializers.CharField(max_length=300)
+    publications_image = serializers.FileField()
     card_number = serializers.CharField(max_length=50)
-    identity_image = serializers.CharField(max_length=300)
+    identity_image = serializers.FileField()
     address = serializers.CharField(max_length=500, required=False)
 
     def validate(self, attrs):
