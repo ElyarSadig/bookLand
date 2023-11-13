@@ -4,14 +4,51 @@ from rest_framework import status
 from .jwt_auth import login_required
 
 
-class Ping(GenericAPIView):
+class ChangePasswordView(GenericAPIView):
 
     @login_required
-    # This is how you obtain user_id, role_id and login_required decorator must be used as well
+    def post(self, request, user_id, role_id, *args, **kwargs):
+        pass
+
+
+class UserProfileView(GenericAPIView):
+
+    @login_required
     def get(self, request, user_id, role_id, *args, **kwargs):
-        data = {
-            "Ping": "You are Authorized Pong!",
-            "user_id": user_id,
-            "role_id": role_id,
-        }
-        return Response(data, status=status.HTTP_200_OK)
+        pass
+
+
+class SearchUserBooksView(GenericAPIView):
+
+    @login_required
+    def get(self, request, user_id, role_id, *args, **kwargs):
+        pass
+
+
+class GetUserBookMarksView(GenericAPIView):
+
+    @login_required
+    def get(self, request, user_id, role_id, *args, **kwargs):
+        pass
+
+
+class GetUserBooksView(GenericAPIView):
+
+    @login_required
+    def get(self, request, user_id, role_id, *args, **kwargs):
+        pass
+
+
+class GetUserWalletHistoryView(GenericAPIView):
+
+    @login_required
+    def get(self, request, user_id, role_id, *args, **kwargs):
+        pass
+
+
+class DeleteUserBookMarkView(GenericAPIView):
+
+    @login_required
+    def delete(self, request, user_id, role_id, *args, **kwargs):
+        bookmark_id = kwargs.get('bookmark_id')
+        pass
