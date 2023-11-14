@@ -1,29 +1,29 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
-from users.api.serializers import UserSignUpSerializer, LoginSerializer, PublisherSignUpSerializer, \
-    SendEmailSerializer, VerifyEmailCodeSerializer, ResetPasswordSerializer
+from users.api.serializers import UserSignUpSerializer, LoginSerializer, SendEmailSerializer, VerifyEmailCodeSerializer,\
+    ResetPasswordSerializer, PublisherAdditionalInfoSerializer, \
+    PublisherImageUploadSerializer
 from .api_result import APIResult
 from users.api.utils import generate_random_code
 from .jwt_token import generate_jwt_token
-from datetime import datetime
 from .db_utils import UserActivityDBUtils, UserAuthenticationDBUtils, UserManagementDBUtils, UserRoleDBUtils
 from users.api.email_utils import send_email_background_task
 from .exceptions import *
+from accounts.api.jwt_auth import login_required
 
 
 class PublisherSignUpView(GenericAPIView):
-    serializer_class = PublisherSignUpSerializer
+    serializer_class = UserSignUpSerializer
 
     def post(self, request):
         response = APIResult()
-        serializer = PublisherSignUpSerializer(data=request.data)
+        serializer = UserSignUpSerializer(data=request.data)
 
         if serializer.is_valid():
             username = serializer.validated_data['username']
             email = serializer.validated_data['email']
-            phone_number = serializer.validated_data['phone_number']
-            publications_name = serializer.validated_data['publications_name']
+            password = serializer.validated_data['password']
 
             if UserManagementDBUtils.username_exists(username):
                 raise UsernameAlreadyExistsError()
@@ -31,13 +31,7 @@ class PublisherSignUpView(GenericAPIView):
             if UserManagementDBUtils.email_exists(email):
                 raise EmailAlreadyExistsError()
 
-            if UserManagementDBUtils.phone_number_exists(phone_number):
-                raise PhoneNumberAlreadyExistsError()
-
-            if UserManagementDBUtils.publications_name_exists(publications_name):
-                raise PublicationsNameAlreadyExistsError()
-
-            user_id = UserManagementDBUtils.create_publisher_user(serializer.validated_data)
+            user_id = UserManagementDBUtils.create_user(username, email, password, is_publisher=True)
 
             UserRoleDBUtils.assign_user_role(user_id, role_id=2)
 
@@ -45,7 +39,53 @@ class PublisherSignUpView(GenericAPIView):
 
             response.api_result['data'] = token
 
-            return Response(response.api_result, status=status.HTTP_201_CREATED)
+            return Response(response.api_result, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PublisherDetailsUpdateView(GenericAPIView):
+    serializer_class = PublisherAdditionalInfoSerializer
+
+    @login_required
+    def put(self, request, user_id, *args, **kwargs):
+        response = APIResult()
+        serializer = PublisherAdditionalInfoSerializer(data=request.data)
+
+        if serializer.is_valid():
+            phone_number = serializer.validated_data["phone_number"]
+            publications_name = serializer.validated_data["publications_name"]
+            card_number = serializer.validated_data["card_number"]
+            address = serializer.validated_data["address"]
+
+            if UserManagementDBUtils.publications_name_exists(publications_name):
+                raise PublicationsNameAlreadyExistsError()
+
+            if UserManagementDBUtils.phone_number_exists(phone_number):
+                raise PhoneNumberAlreadyExistsError()
+
+            UserManagementDBUtils.update_publisher_info(user_id, phone_number, publications_name, card_number, address)
+
+            return Response(response.api_result, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PublisherImageUploadView(GenericAPIView):
+    serializer_class = PublisherImageUploadSerializer
+
+    @login_required
+    def put(self, request, user_id, *args, **kwargs):
+        response = APIResult()
+        serializer = PublisherImageUploadSerializer(data=request.data)
+        if serializer.is_valid():
+
+            publications_image = serializer.validated_data['publications_image']
+            identity_image = serializer.validated_data['identity_image']
+
+            UserManagementDBUtils.update_publisher_files(user_id, publications_image, identity_image)
+
+            return Response(response.api_result, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -76,7 +116,7 @@ class UserSignUpView(GenericAPIView):
 
             response.api_result['data'] = token
 
-            return Response(response.api_result, status=status.HTTP_201_CREATED)
+            return Response(response.api_result, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -146,19 +186,7 @@ class VerifyEmailCodeView(GenericAPIView):
             email = serializer.validated_data['email']
             activation_code = serializer.validated_data['activation_code']
 
-            latest_activation_code = UserActivityDBUtils.get_latest_activation_code(email)
-
-            if not latest_activation_code:
-                raise EmailDoesNotExistError()
-
-            code, expired_datetime = latest_activation_code
-            current_datetime = datetime.now()
-
-            if current_datetime > expired_datetime:
-                raise ExpiredCodeError()
-
-            if code != activation_code:
-                raise InvalidCodeError()
+            UserActivityDBUtils.validate_activation_code(email, activation_code)
 
             return Response(response.api_result, status=status.HTTP_200_OK)
 
@@ -202,19 +230,7 @@ class PasswordResetView(GenericAPIView):
             activation_code = serializer.validated_data['activation_code']
             password = serializer.validated_data['password']
 
-            latest_activation_code = UserActivityDBUtils.get_latest_activation_code(email)
-
-            if not latest_activation_code:
-                raise EmailDoesNotExistError()
-
-            code, expired_datetime = latest_activation_code
-            current_datetime = datetime.now()
-
-            if current_datetime > expired_datetime:
-                raise ExpiredCodeError()
-
-            if code != activation_code:
-                raise InvalidCodeError()
+            UserActivityDBUtils.validate_activation_code(email, activation_code)
 
             UserManagementDBUtils.update_user_password(password, email)
 
