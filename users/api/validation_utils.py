@@ -36,3 +36,33 @@ def validate_iranian_phone_number(phone_number):
         return True
     else:
         return False
+
+
+def is_valid_iranian_bank_card(card_number):
+    # Remove any spaces or non-digit characters
+    card_number = ''.join(filter(str.isdigit, card_number))
+
+    # Check if the length is valid
+    if len(card_number) != 16:
+        return False
+
+    # Check if the format matches common Iranian bank card formats
+    if not card_number.startswith('6037') and not card_number.startswith('6278'):
+        return False
+
+    # Apply the Luhn algorithm (modulus 10 algorithm) for further validation
+    total = 0
+    reverse_digits = card_number[::-1]
+
+    for i in range(len(reverse_digits)):
+        digit = int(reverse_digits[i])
+
+        if i % 2 == 1:
+            digit *= 2
+            if digit > 9:
+                digit -= 9
+
+        total += digit
+
+    return total % 10 == 0
+
