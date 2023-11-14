@@ -43,51 +43,16 @@ class UserSignUpSerializer(serializers.Serializer):
         return attrs
 
 
-class PublisherSignUpSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=150)
-    email = serializers.CharField(max_length=150)
-    password = serializers.CharField(write_only=True)
-    password2 = serializers.CharField(write_only=True)
+class PublisherAdditionalInfoSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=20)
-    publications_name = serializers.CharField(max_length=200)
-    publications_image = serializers.FileField()
-    card_number = serializers.CharField(max_length=50)
-    identity_image = serializers.FileField()
-    address = serializers.CharField(max_length=500, required=False)
+    publications_name = serializers.CharField(max_length=300)
+    card_number = serializers.CharField()
+    address = serializers.CharField()
 
     def validate(self, attrs):
 
-        if not is_username_valid(attrs["username"]):
-            raise serializers.ValidationError({
-                "result": {
-                    "error_code": "InvalidUsername",
-                    "error_message": "نام کاربری نا معتبر",
-                    "errors": ""
-                },
-                "data": "",
-            })
-
-        if not is_email_valid(attrs["email"]):
-            raise serializers.ValidationError({
-                "result": {
-                    "error_code": "InvalidEmail",
-                    "error_message": "ایمیل نامعتبر",
-                    "errors": ""
-                },
-                "data": "",
-            })
-
-        if not password_match(attrs["password"], attrs["password2"]):
-            raise serializers.ValidationError({
-                "result": {
-                    "error_code": "PasswordsDoNotMatch",
-                    "error_message": "پسورد مطابقت ندارد",
-                    "errors": ""
-                },
-                "data": "",
-            })
-
         if not validate_iranian_phone_number(attrs["phone_number"]):
+
             raise serializers.ValidationError({
                 "result": {
                     "error_code": "InvalidPhoneNumber",
@@ -98,6 +63,11 @@ class PublisherSignUpSerializer(serializers.Serializer):
             })
 
         return attrs
+
+
+class PublisherImageUploadSerializer(serializers.Serializer):
+    publications_image = serializers.FileField()
+    identity_image = serializers.FileField()
 
 
 class LoginSerializer(serializers.Serializer):
