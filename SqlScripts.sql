@@ -11,7 +11,7 @@ CREATE TABLE Users (
     PhoneNumber VARCHAR(20) UNIQUE,
     PhoneNumber2 VARCHAR(20),
     Address TEXT,
-    IdentityPath TEXT,
+    IdentityImage TEXT,
     CardNumber VARCHAR(50),
     PublicationsName VARCHAR(255) UNIQUE,
     PublicationsImage TEXT,
