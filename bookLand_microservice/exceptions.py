@@ -16,7 +16,7 @@ def custom_exception_handler(exc, context):
         UsernameAlreadyExistsError: "نام کاربری قبلا ثبت شده است",
         EmailAlreadyExistsError: "ایمیل قبلا ثبت شده است",
         PhoneNumberAlreadyExistsError: "شماره تلفن قبلا ثبت شده است",
-        PublicationsNameAlreadyExistsError: "ناشر با این قبلا ثبت شده است",
+        PublicationsNameAlreadyExistsError: "نام تجاری قبلا ثبت شده است",
         InvalidUserCredentialsError: "اطلاعات ورودی صحیح نمی باشد",
         EmailDoesNotExistError: "ایمیل یافت نشد",
         ExpiredCodeError: "کد منقضی شده است",
