@@ -1,6 +1,8 @@
 from django.db import connection
 import hashlib
 from .file_handler import process_and_upload_identity_path, process_and_upload_publications_image
+from datetime import datetime
+from .exceptions import EmailDoesNotExistError, ExpiredCodeError, InvalidCodeError
 
 
 class UserAuthenticationDBUtils:
@@ -27,15 +29,15 @@ class UserAuthenticationDBUtils:
 class UserManagementDBUtils:
 
     @classmethod
-    def create_user(cls, username, email, password):
+    def create_user(cls, username, email, password, is_publisher=False, is_confirm=False):
         password_hash = hashlib.sha256(password.encode()).hexdigest()
         query = """
             INSERT INTO public.Users (Username, Email, HashedPassword, IsActive, IsPublisher, IsConfirm, RegistrationDate)
-            VALUES (%s, %s, %s, TRUE, FALSE, FALSE, NOW() + INTERVAL '3 hours 30 minutes')
+            VALUES (%s, %s, %s, TRUE, %s, %s, NOW() + INTERVAL '3 hours 30 minutes')
             RETURNING Id
             """
         with connection.cursor() as cursor:
-            cursor.execute(query, [username, email, password_hash])
+            cursor.execute(query, [username, email, password_hash, is_publisher, is_confirm])
             return cursor.fetchone()[0]
 
     @classmethod
@@ -71,34 +73,34 @@ class UserManagementDBUtils:
             return cursor.fetchone()[0]
 
     @classmethod
-    def create_publisher_user(cls, validated_data):
-        username = validated_data['username']
-        email = validated_data['email']
-        password = validated_data['password']
-        phone_number = validated_data['phone_number']
-        publications_name = validated_data['publications_name']
-        card_number = validated_data['card_number']
-        identity_path = validated_data['identity_image']
-        publications_image = validated_data['publications_image']
-        address = validated_data['address']
-
-        identity_path_uuid = process_and_upload_identity_path(identity_path)
-        publications_image_uuid = process_and_upload_publications_image(publications_image)
-
-        password_hash = hashlib.sha256(password.encode()).hexdigest()
-
-        query = """
-            INSERT INTO public.Users (Username, Email, HashedPassword, IsActive, IsPublisher, IsConfirm,
-            RegistrationDate, PhoneNumber, PublicationsName, CardNumber, IdentityPath, PublicationsImage, Address)
-            VALUES (%s, %s, %s, TRUE, TRUE, FALSE, NOW() + INTERVAL '3 hours 30 minutes', %s, %s, %s, %s, %s, %s)
-            RETURNING Id
-            """
-
+    def update_publisher_info(cls, user_id, phone_number, publications_name, card_number, address):
         with connection.cursor() as cursor:
-            cursor.execute(query, [username, email, password_hash, phone_number, publications_name,
-                                   card_number, identity_path_uuid, publications_image_uuid, address])
+            cursor.execute(
+                """
+                UPDATE public.Users
+                SET PhoneNumber = %s,
+                    PublicationsName = %s,
+                    CardNumber = %s,
+                    Address = %s
+                WHERE Id = %s
+                """,
+                [phone_number, publications_name, card_number, address, user_id]
+            )
 
-            return cursor.fetchone()[0]
+    @classmethod
+    def update_publisher_files(cls, user_id, publications_image, identity_image):
+        publications_file_path = process_and_upload_publications_image(publications_image)
+        identity_file_path = process_and_upload_identity_path(identity_image)
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE public.Users
+                SET IdentityImage = %s,
+                    PublicationsImage = %s
+                WHERE Id = %s
+                """,
+                [identity_file_path, publications_file_path, user_id]
+            )
 
     @classmethod
     def update_user_password(cls, password, email):
@@ -164,3 +166,19 @@ class UserActivityDBUtils:
             row = cursor.fetchone()
 
             return row
+
+    @classmethod
+    def validate_activation_code(cls, email, activation_code):
+        latest_activation_code = cls.get_latest_activation_code(email)
+
+        if not latest_activation_code:
+            raise EmailDoesNotExistError()
+
+        code, expired_datetime = latest_activation_code
+        current_datetime = datetime.now()
+
+        if current_datetime > expired_datetime:
+            raise ExpiredCodeError()
+
+        if code != activation_code:
+            raise InvalidCodeError()
