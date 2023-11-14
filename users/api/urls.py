@@ -1,6 +1,7 @@
 from django.urls import path
 from users.api.views import UserSignUpView, UserLoginView, SendSignUpEmailView, VerifyEmailCodeView, \
-    SendPasswordResetCodeView, PasswordResetView, PublisherSignUpView
+    SendPasswordResetCodeView, PasswordResetView, PublisherSignUpView, PublisherImageUploadView, \
+    PublisherDetailsUpdateView
 
 
 urlpatterns = [
@@ -11,4 +12,6 @@ urlpatterns = [
     path("send-resetpassword-code", SendPasswordResetCodeView.as_view(), name="password-reset-code"),
     path("reset-password", PasswordResetView.as_view(), name="reset-password"),
     path("publisher/signup", PublisherSignUpView.as_view(), name="publisher-signup"),
+    path("publisher/signup-1", PublisherDetailsUpdateView.as_view(), name="publisher-detail"),
+    path("publisher/signup-2", PublisherImageUploadView.as_view(), name="publisher-file-upload"),
 ]
