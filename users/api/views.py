@@ -48,7 +48,7 @@ class PublisherDetailsUpdateView(GenericAPIView):
     serializer_class = PublisherAdditionalInfoSerializer
 
     @login_required
-    def put(self, request, user_id, *args, **kwargs):
+    def put(self, request, user_id, role_id, *args, **kwargs):
         response = APIResult()
         serializer = PublisherAdditionalInfoSerializer(data=request.data)
 
