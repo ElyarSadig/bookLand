@@ -66,7 +66,7 @@ class PublisherAdditionalInfoSerializer(serializers.Serializer):
 
 
 class PublisherImageUploadSerializer(serializers.Serializer):
-    publications_image = serializers.FileField()
+    publications_image = serializers.FileField(required=False)
     identity_image = serializers.FileField()
 
 
