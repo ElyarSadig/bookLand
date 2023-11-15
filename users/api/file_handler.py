@@ -34,14 +34,14 @@ def upload_to_file_server(file, postfix):
     files = {'file': (file_name, file)}
 
     response = requests.post(
-        file_server_url + postfix,
+        file_server_url + "/upload" + postfix,
         files=files,
         headers={'Authorization': auth_token},
         timeout=1
     )
 
     if response.status_code == 200:
-        return file_name  # Adjust this based on your file server response
+        return file_server_url + postfix + "/" + file_name  # Adjust this based on your file server response
 
 
 
