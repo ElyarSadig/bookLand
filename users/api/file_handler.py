@@ -1,17 +1,7 @@
-import os
 import uuid
 import requests
 from decouple import config
 from .exceptions import InvalidFileFormatError, FileUploadFailedError
-
-
-ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'pdf', 'png'}
-
-
-# def check_extension(file_path):
-#     file_extension = os.path.splitext(file_path)[1][1:].lower()
-#     if file_extension not in ALLOWED_EXTENSIONS:
-#         raise InvalidFileFormatError()
 
 
 def generate_uuid():
@@ -27,7 +17,6 @@ def process_and_upload_publications_image(file_path, postfix="/publications"):
 
 
 def upload_to_file_server(file, postfix):
-    # check_extension(file_path)
     file_name = generate_uuid() + '_' + file.name
     file_server_url = config('FILE_SERVER_URL')
     auth_token = config('AUTH_TOKEN')
@@ -41,7 +30,7 @@ def upload_to_file_server(file, postfix):
     )
 
     if response.status_code == 200:
-        return file_server_url + postfix + "/" + file_name  # Adjust this based on your file server response
+        return file_server_url + postfix + "/" + file_name
 
 
 
