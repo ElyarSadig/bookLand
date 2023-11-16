@@ -89,8 +89,14 @@ class UserManagementDBUtils:
 
     @classmethod
     def update_publisher_files(cls, user_id, publications_image, identity_image):
-        publications_file_path = process_and_upload_publications_image(publications_image)
+
+        publications_file_path = ""
+
+        if publications_image is not None:
+            publications_file_path = process_and_upload_publications_image(publications_image)
+
         identity_file_path = process_and_upload_identity_path(identity_image)
+
         with connection.cursor() as cursor:
             cursor.execute(
                 """
