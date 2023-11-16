@@ -167,7 +167,9 @@ class SendSignUpEmailView(GenericAPIView):
 
             UserActivityDBUtils.create_user_activity_code(email, activation_code)
 
-            send_email_background_task(activation_code, email)
+            subject = "فعال سازی حساب کاربری"
+            template = "users/email_signup.html"
+            send_email_background_task(subject, template, activation_code, email)
 
             return Response(response.api_result, status=status.HTTP_200_OK)
 
@@ -206,11 +208,13 @@ class SendPasswordResetCodeView(GenericAPIView):
             if not UserManagementDBUtils.email_exists(email):
                 raise EmailDoesNotExistError()
 
-            activation_code = generate_random_code()
+            code = generate_random_code()
 
-            UserActivityDBUtils.create_user_activity_code(email, activation_code)
+            UserActivityDBUtils.create_user_activity_code(email, code)
 
-            send_email_background_task(activation_code, email)
+            subject = "بازیابی رمز عبور"
+            template = "users/reset_password_email.html"
+            send_email_background_task(subject, template, code, email)
 
             return Response(response.api_result, status=status.HTTP_200_OK)
 
