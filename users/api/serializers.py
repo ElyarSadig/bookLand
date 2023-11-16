@@ -2,6 +2,13 @@ from rest_framework import serializers
 from users.api.validation_utils import is_email_valid, is_username_valid, password_match, validate_iranian_phone_number
 
 
+def validate_file_type(value):
+    allowed_types = ['image/jpeg', 'image/png', 'image/jpg']
+
+    if value.content_type not in allowed_types:
+        raise serializers.ValidationError("Invalid file type. Only JPEG, JPG and PNG files are allowed.")
+
+
 class UserSignUpSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=50)
     email = serializers.CharField(max_length=50)
@@ -66,8 +73,15 @@ class PublisherAdditionalInfoSerializer(serializers.Serializer):
 
 
 class PublisherImageUploadSerializer(serializers.Serializer):
-    publications_image = serializers.FileField(required=False)
-    identity_image = serializers.FileField()
+    publications_image = serializers.FileField(allow_null=True, validators=[validate_file_type])
+    identity_image = serializers.FileField(allow_null=True, validators=[validate_file_type])
+
+    def to_internal_value(self, data):
+
+        if "publications_image" in data and data["publications_image"] == "null":
+            data["publications_image"] = None
+
+        return super().to_internal_value(data)
 
 
 class LoginSerializer(serializers.Serializer):
