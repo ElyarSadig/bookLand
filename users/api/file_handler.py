@@ -18,7 +18,7 @@ def process_and_upload_publications_image(file_path, postfix="/publications"):
 
 def upload_to_file_server(file, postfix):
     file_name = generate_uuid() + '_' + file.name
-    file_server_url = config('FILE_SERVER_URL')
+    file_server_url = config('FILE_SERVER', default='http://localhost:8080')
     auth_token = config('AUTH_TOKEN')
     files = {'file': (file_name, file)}
 
