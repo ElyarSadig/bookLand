@@ -111,7 +111,7 @@ DATABASES = {
         'NAME': 'BookLandDB',
         'USER': 'admin',
         'PASSWORD': 'password',
-        'HOST': config('HOST_DB', default='localhost'),
+        'HOST': config('DB_HOST', default='localhost'),
         'PORT': '5432',
     }
 }
