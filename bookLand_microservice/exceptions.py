@@ -26,6 +26,7 @@ def custom_exception_handler(exc, context):
         InvalidTokenError: "توکن نامعتبر",
         MissingTokenError: "توکن وجود ندارد",
         ExpiredSignatureError: "توکن منقضی شده است",
+        WrongPasswordError:"رمز وارد شده صحیح نیست",
 
         FileUploadFailedError: "خطایی هنگام آپلود فایل در سیستم رخ داد",
         ProgrammingError: "An error occurred while running the cursor",

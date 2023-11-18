@@ -9,3 +9,7 @@ class ExpiredSignatureError(Exception):
 
 class InvalidTokenError(Exception):
     pass
+
+
+class WrongPasswordError(Exception):
+    pass
