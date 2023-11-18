@@ -109,8 +109,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'BookLandDB',
-        'USER': 'admin',
-        'PASSWORD': 'password',
+        'USER': 'postgres',         # admin
+        'PASSWORD': '199020',       # password
         'HOST': config('HOST_DB', default='localhost'),
         'PORT': '5432',
     }
@@ -164,6 +164,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     'EXCEPTION_HANDLER': 'bookLand_microservice.exceptions.custom_exception_handler',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 9
 }
 
 SPECTACULAR_SETTINGS = {
@@ -179,3 +181,5 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL')
 EMAIL_HOST_PASSWORD = config('EMAIL_PASSWORD')
+
+
