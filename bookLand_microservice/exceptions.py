@@ -6,6 +6,7 @@ from users.api.api_result import APIResult
 import logging
 from users.api.exceptions import *
 from accounts.api.exceptions import *
+from rest_framework.exceptions import NotFound
 
 
 def custom_exception_handler(exc, context):
@@ -22,6 +23,7 @@ def custom_exception_handler(exc, context):
         ExpiredCodeError: "کد منقضی شده است",
         InvalidCodeError: "کد وارد شده نا معتبر است",
         InvalidFileFormatError: "فایل نامعتبر",
+        NotFound: "یافت نشد",
 
         InvalidTokenError: "توکن نامعتبر",
         MissingTokenError: "توکن وجود ندارد",
@@ -46,6 +48,9 @@ def custom_exception_handler(exc, context):
 
             if isinstance(exc, authorization_exceptions):
                 status_code = status.HTTP_401_UNAUTHORIZED
+
+            if isinstance(exc, NotFound):
+                status_code = status.HTTP_404_NOT_FOUND
 
             logging.error(f"Exception: {exc}, Error Code: {exception_type.__name__}, Message: {error_message}")
 
