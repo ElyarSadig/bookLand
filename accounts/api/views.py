@@ -4,10 +4,9 @@ from rest_framework import status
 from .jwt_auth import login_required
 from users.api.api_result import APIResult
 from .serializers import PasswordChangeSerializer
-from django.db import connection
 from .exceptions import *
 from rest_framework.pagination import PageNumberPagination
-from .db_utils import AccountManagementDBUtils, hash_password, info_dict
+from .db_utils import AccountManagementDBUtils, hash_password
 
 
 class ChangePasswordView(GenericAPIView):
@@ -22,14 +21,18 @@ class ChangePasswordView(GenericAPIView):
             old_password = serializer.validated_data['old_password']
             new_password = serializer.validated_data['new_password']
 
-        stored_password = AccountManagementDBUtils.get_user_stored_password(user_id=user_id)
-        hashed_old_password = hash_password(old_password)
+            stored_password = AccountManagementDBUtils.get_user_stored_password(user_id=user_id)
+            hashed_old_password = hash_password(old_password)
 
-        if hashed_old_password == stored_password:
-            AccountManagementDBUtils.update_password(new_password=new_password, user_id=user_id)
-            return Response(response.api_result, status=status.HTTP_200_OK)
-        else:
+            if hashed_old_password == stored_password:
+
+                AccountManagementDBUtils.update_password(new_password=new_password, user_id=user_id)
+
+                return Response(response.api_result, status=status.HTTP_200_OK)
+
             raise WrongPasswordError()
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserProfileView(GenericAPIView):
@@ -84,3 +87,17 @@ class DeleteUserBookMarkView(GenericAPIView):
         AccountManagementDBUtils.update_user_bookmark(user_id=user_id, bookmark_id=bookmark_id)
 
         return Response(response.api_result, status=status.HTTP_200_OK)
+
+
+class UserWalletBalance(GenericAPIView):
+
+    @login_required
+    def get(self, request, user_id, role_id, *args, **kwargs):
+        response = APIResult()
+
+        total_balance = AccountManagementDBUtils.get_total_successful_amount(user_id)
+
+        response.api_result['data'] = total_balance
+
+        return Response(response.api_result, status=status.HTTP_200_OK)
+
