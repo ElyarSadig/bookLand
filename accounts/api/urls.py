@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import ChangePasswordView, UserProfileView, GetUserBooksView, \
-    GetUserBookMarksView, GetUserWalletHistoryView, DeleteUserBookMarkView
+    GetUserBookMarksView, GetUserWalletHistoryView, DeleteUserBookMarkView, UserWalletBalance
 
 urlpatterns = [
     path("change-password", ChangePasswordView.as_view(), name='change-old-password'),
@@ -9,4 +9,5 @@ urlpatterns = [
     path("bookmarks", GetUserBookMarksView.as_view()),
     path("wallet-history", GetUserWalletHistoryView.as_view()),
     path("bookmarks/<str:bookmark_id>", DeleteUserBookMarkView.as_view()),
+    path("wallet-balance", UserWalletBalance.as_view())
 ]
