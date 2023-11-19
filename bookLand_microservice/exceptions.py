@@ -46,6 +46,8 @@ def custom_exception_handler(exc, context):
             if isinstance(exc, authorization_exceptions):
                 status_code = status.HTTP_401_UNAUTHORIZED
 
+            logging.error(f"Exception: {exc}, Error Code: {exception_type.__name__}, Message: {error_message}")
+
             return error_response(response, error_code=exception_type.__name__, error_message=error_message,
                                   status_code=status_code)
 
