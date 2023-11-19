@@ -1,12 +1,15 @@
-version: "3.8"
+version: "3"
 
 services:
   user_service:
     build:
       context: .
       dockerfile: ./bookLand_microservice.dockerfile
+    environment:
+      - DB_HOST=postgres-db
+      - FILE_SERVER=http://file-server:8080
     networks:
-      - db_network
+      - my_network
     ports:
       - "8000:8000"
     volumes:
@@ -22,10 +25,12 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - db_network
+      - my_network
     volumes:
       - ./SqlScripts.sql:/docker-entrypoint-initdb.d/SqlScripts.sql
       - ./db-data/postgres/:/var/lib/postgresql/data/
 
-networks:
-  db_network:
+networks: # Note that network must be created before running compose with this network
+  my_network:
+    external: true
+
