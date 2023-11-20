@@ -172,9 +172,9 @@ INSERT INTO Languages (Name) VALUES
 
 -- Insert data into Role
 INSERT INTO Roles (Role, Description) VALUES
-('Admin', 'Administrator of the platform'),
-('Publisher', 'Publishes books on the platform'),
-('Customer', 'Buys and reviews books on the platform');
+('Admin', 'Administrator of the platform'),                 -- 1
+('Publisher', 'Publishes books on the platform'),           -- 2
+('Customer', 'Buys and reviews books on the platform');     -- 3
 
 -- Insert data into Category
 INSERT INTO Categories (Name) VALUES
@@ -198,34 +198,34 @@ INSERT INTO Categories (Name) VALUES
 INSERT INTO Users (Username, Email, HashedPassword, IsActive, RegistrationDate, IsPublisher, IsConfirm)
 VALUES 
 ('Ali', 'alitaami2002@gmail.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', TRUE, '2023-01-01', FALSE, TRUE),
-('Elyar', 'ElyarNejati@gmail.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', TRUE, '2023-01-02', TRUE, TRUE),
+('Elyar', 'ElyarNejati@gmail.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', TRUE, '2023-01-02', FALSE, TRUE),
 ('Admin', 'alitaami81@gmail.com', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', TRUE, '2023-01-03', FALSE, TRUE),
 ('John', 'john@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', TRUE, '2023-01-04', TRUE, TRUE),
-('Jane', 'jane@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', TRUE, '2023-01-05', FALSE, TRUE),
+('Jane', 'jane@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', TRUE, '2023-01-05', TRUE, TRUE),
 ('Robert', 'robert@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', TRUE, '2023-01-06', TRUE, TRUE),
 ('Emily', 'emily@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', TRUE, '2023-01-07', FALSE, TRUE),
-('William', 'william@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', TRUE, '2023-01-08', TRUE, TRUE);
+('William', 'william@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', TRUE, '2023-01-08', FALSE, TRUE);
 
 -- Insert data into UserRole
 INSERT INTO UserRoles (UserId, RoleId)
 VALUES 
 (1, 3), -- Ali is a Customer
-(2, 2), -- Elyar is a Publisher
+(2, 3), -- Elyar is a Customer
 (3, 1), -- Admin is an Admin
 (4, 2), -- John is a Publisher
-(5, 3), -- Jane is a Customer
+(5, 2), -- Jane is a Publisher
 (6, 2), -- Robert is a Publisher
 (7, 3), -- Emily is a Customer
-(8, 2); -- William is a Publisher
+(8, 3); -- William is a Customer
 
--- Insert data into Book
-INSERT INTO Books (UserId, BookName, AuthorName, ReleasedDate, Price, NumberOfPages, LanguageId, IsDelete)
+-- Insert data into Book here UserId is actually publisher's id
+INSERT INTO Books (UserId, BookName, AuthorName, ReleasedDate, BookCoverImage, Price, NumberOfPages, LanguageId, IsDelete)
 VALUES 
-(2, 'جزیره مرموز', 'ژول ورن',1874, 100, 450, 1, FALSE),
-(2, 'دور دنیا در 80 روز', 'ژول ورن', 1873,0, 250, 1, FALSE),
-(4, 'ماجراجویی بزرگ', 'جان اسمیت', 2020,10000, 350, 2, FALSE),
-(6, 'رازهای جهان', 'رابرت براون',2019,20000, 500, 3, FALSE),
-(8, 'عشق در پاریس', 'ویلیام جانسون',2021, 14000, 300, 4, FALSE);
+(4, 'جزیره مرموز', 'ژول ورن',1874, 'http://localhost:8080/book-covers/demo-1.png' ,100, 450, 1, FALSE),
+(4, 'دور دنیا در 80 روز', 'ژول ورن', 1873, 'http://localhost:8080/book-covers/demo-2.png', 0, 250, 1, FALSE),
+(5, 'ماجراجویی بزرگ', 'جان اسمیت', 2020,'http://localhost:8080/book-covers/demo-3.jpg',10000, 350, 2, FALSE),
+(6, 'رازهای جهان', 'رابرت براون',2019, 'http://localhost:8080/book-covers/demo-4.jpeg' ,20000, 500, 3, FALSE),
+(5, 'عشق در پاریس', 'ویلیام جانسون',2021, 'http://localhost:8080/book-covers/demo-5.jpg', 14000, 300, 4, FALSE);
 
 -- Insert data into Review
 INSERT INTO Reviews (User_Id, Book_Id, Rating, CreatedAt)
@@ -249,19 +249,19 @@ VALUES
 INSERT INTO UserBooks (BookId, UserId, BoughtTime)
 VALUES 
 (1, 1, '2023-01-10 10:05:00'),
-(2, 3, '2023-01-15 14:05:00'),
-(3, 5, '2023-01-16 10:05:00'),
-(4, 7, '2023-01-17 11:05:00'),
-(5, 1, '2023-01-18 12:05:00');
+(2, 1, '2023-01-15 14:05:00'),
+(3, 1, '2023-01-16 10:05:00'),
+(4, 2, '2023-01-17 11:05:00'),
+(5, 2, '2023-01-18 12:05:00');
 
 -- Insert data into UserBookmarks
 INSERT INTO UserBookmarks (BookId, UserId, AddedTime, IsDelete)
 VALUES 
-(1, 3, '2023-01-16 09:00:00', FALSE),
-(2, 5, '2023-01-17 09:00:00', FALSE),
-(3, 7, '2023-01-18 09:00:00', FALSE),
+(1, 2, '2023-01-16 09:00:00', FALSE),
+(2, 2, '2023-01-17 09:00:00', FALSE),
+(3, 1, '2023-01-18 09:00:00', FALSE),
 (4, 1, '2023-01-19 09:00:00', FALSE),
-(5, 3, '2023-01-20 09:00:00', FALSE);
+(5, 2, '2023-01-20 09:00:00', FALSE);
 
 -- Insert data into Comments
 INSERT INTO Comments (BookId, UserId, Comment, IsDelete, CreatedDate)
@@ -284,8 +284,8 @@ VALUES
 -- Insert data into WalletActionType
 INSERT INTO WalletActionTypes (ActionType)
 VALUES 
-('Deposit'),
-('Withdraw');
+('واریز'),
+('برداشت');
  
 -- Insert data into WalletAction
 INSERT INTO WalletActions (ActionTypeId, UserId, Amount, IsSuccessful, Description, CreatedDate)
