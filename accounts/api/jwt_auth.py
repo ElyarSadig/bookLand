@@ -1,5 +1,5 @@
 from functools import wraps
-from .exceptions import MissingTokenError, InvalidTokenError, ExpiredSignatureError
+from .exceptions import MissingTokenError, InvalidTokenError, ExpiredSignatureError, PermissionDeniedError
 import jwt
 from decouple import config
 
@@ -31,6 +31,9 @@ def login_required(view_func):
             token = auth_header.split('Bearer ')[1]
 
             user_id, role_id = extract_user_and_role_id(token)
+
+            if role_id != 3:
+                raise PermissionDeniedError()
 
             return view_func(self, request, user_id, role_id, *args, **kwargs)
 
