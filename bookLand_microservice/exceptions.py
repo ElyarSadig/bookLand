@@ -25,10 +25,12 @@ def custom_exception_handler(exc, context):
         InvalidFileFormatError: "فایل نامعتبر",
         NotFound: "یافت نشد",
 
-        InvalidTokenError: "توکن نامعتبر",
-        MissingTokenError: "توکن وجود ندارد",
-        ExpiredSignatureError: "توکن منقضی شده است",
+        InvalidTokenError: "کاربر عزیز لطفا مجددا لاگین شوید",
+        MissingTokenError: "کاربر عزیز لطفا مجددا لاگین شوید",
+        ExpiredSignatureError: "کاربر عزیز لطفا مجددا لاگین شوید",
         WrongPasswordError: "رمز وارد شده صحیح نیست",
+
+        PermissionDeniedError: "کاربر عزیز شما به این بخش دسترسی ندارید",
 
         FileUploadFailedError: "خطایی هنگام آپلود فایل در سیستم رخ داد",
         ProgrammingError: "An error occurred while running the cursor",
@@ -52,7 +54,8 @@ def custom_exception_handler(exc, context):
             if isinstance(exc, NotFound):
                 status_code = status.HTTP_404_NOT_FOUND
 
-            logging.error(f"Exception: {exc}, Error Code: {exception_type.__name__}, Message: {error_message}")
+            if isinstance(exc, PermissionDeniedError):
+                status_code = status.HTTP_403_FORBIDDEN
 
             return error_response(response, error_code=exception_type.__name__, error_message=error_message,
                                   status_code=status_code)
