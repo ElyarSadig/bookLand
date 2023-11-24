@@ -32,7 +32,7 @@ def login_required(view_func):
 
             user_id, role_id = extract_user_and_role_id(token)
 
-            if role_id != 3:
+            if role_id != 2:
                 raise PermissionDeniedError()
 
             return view_func(self, request, user_id, role_id, *args, **kwargs)
