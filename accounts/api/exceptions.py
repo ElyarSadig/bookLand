@@ -13,3 +13,7 @@ class InvalidTokenError(Exception):
 
 class WrongPasswordError(Exception):
     pass
+
+
+class PermissionDeniedError(Exception):
+    pass
