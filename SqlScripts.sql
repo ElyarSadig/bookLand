@@ -3,18 +3,19 @@ CREATE TABLE Users (
     Id SERIAL PRIMARY KEY,
     Username VARCHAR(255) UNIQUE,
     Email VARCHAR(255) UNIQUE,
-    HashedPassword TEXT NOT NULL,
+    HashedPassword VARCHAR(255) NOT NULL,
+    Salt VARCHAR(255) NOT NULL,
     IsActive BOOLEAN NOT NULL,
     RegistrationDate TIMESTAMP NOT NULL,
     LastLoginDate TIMESTAMP,
     IsPublisher BOOLEAN NOT NULL,
-    PhoneNumber VARCHAR(20) UNIQUE,
-    PhoneNumber2 VARCHAR(20),
+    PhoneNumber VARCHAR(11) UNIQUE,
+    PhoneNumber2 VARCHAR(11),
     Address TEXT,
-    IdentityImage TEXT,
+    IdentityImage VARCHAR(255),
     CardNumber VARCHAR(50),
     PublicationsName VARCHAR(255) UNIQUE,
-    PublicationsImage TEXT,
+    PublicationsImage VARCHAR(255),
     IsConfirm BOOLEAN NOT NULL
 );
 
@@ -55,7 +56,7 @@ CREATE TABLE Books (
     AuthorName VARCHAR(255) NOT NULL,
     TranslatorName VARCHAR(255),
     ReleasedDate INTEGER NOT NULL,
-    BookCoverImage TEXT,
+    BookCoverImage VARCHAR(255),
     Price DECIMAL(10,2) NOT NULL,
     Description TEXT,
     NumberOfPages INTEGER,
@@ -68,8 +69,8 @@ CREATE TABLE Books (
 -- Review table
 CREATE TABLE Reviews (
     Id SERIAL PRIMARY KEY,
-    User_Id INTEGER REFERENCES Users(Id),
-    Book_Id INTEGER REFERENCES Books(Id),
+    UserId INTEGER REFERENCES Users(Id),
+    BookId INTEGER REFERENCES Books(Id),
     Rating INTEGER CHECK (Rating BETWEEN 1 AND 5),
     CreatedAt TIMESTAMP
 );
@@ -78,8 +79,8 @@ CREATE TABLE Reviews (
 CREATE TABLE BookFiles (
     Id SERIAL PRIMARY KEY,
     BookId INTEGER REFERENCES Books(Id),
-    BookDemoFile TEXT,
-    BookOriginalFile TEXT
+    BookDemoFile VARCHAR(255),
+    BookOriginalFile VARCHAR(255)
 );
 
 -- UserBooks table
@@ -172,9 +173,8 @@ INSERT INTO Languages (Name) VALUES
 
 -- Insert data into Role
 INSERT INTO Roles (Role, Description) VALUES
-('Admin', 'Administrator of the platform'),                 -- 1
-('Publisher', 'Publishes books on the platform'),           -- 2
-('Customer', 'Buys and reviews books on the platform');     -- 3
+('Publisher', 'Publishes books on the platform'),           -- 1
+('Customer', 'Buys and reviews books on the platform');     -- 2
 
 -- Insert data into Category
 INSERT INTO Categories (Name) VALUES
@@ -195,28 +195,28 @@ INSERT INTO Categories (Name) VALUES
 ('عاشقانه');          -- Romance
 
 -- Insert data into User
-INSERT INTO Users (Username, Email, HashedPassword, IsActive, RegistrationDate, IsPublisher, IsConfirm)
+INSERT INTO Users (Username, Email, HashedPassword, Salt, IsActive, RegistrationDate, IsPublisher, IsConfirm)
 VALUES 
-('Ali', 'alitaami2002@gmail.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', TRUE, '2023-01-01', FALSE, TRUE),
-('Elyar', 'ElyarNejati@gmail.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', TRUE, '2023-01-02', FALSE, TRUE),
-('Admin', 'alitaami81@gmail.com', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', TRUE, '2023-01-03', FALSE, TRUE),
-('John', 'john@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', TRUE, '2023-01-04', TRUE, TRUE),
-('Jane', 'jane@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', TRUE, '2023-01-05', TRUE, TRUE),
-('Robert', 'robert@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', TRUE, '2023-01-06', TRUE, TRUE),
-('Emily', 'emily@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', TRUE, '2023-01-07', FALSE, TRUE),
-('William', 'william@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', TRUE, '2023-01-08', FALSE, TRUE);
+('Ali', 'alitaami2002@gmail.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'as', TRUE, '2023-01-01', FALSE, TRUE),
+('Elyar', 'ElyarNejati@gmail.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8','as', TRUE, '2023-01-02', FALSE, TRUE),
+('Admin', 'alitaami81@gmail.com', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'as', TRUE, '2023-01-03', FALSE, TRUE),
+('John', 'john@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'as', TRUE, '2023-01-04', TRUE, TRUE),  --publisher
+('Jane', 'jane@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'as', TRUE, '2023-01-05', TRUE, TRUE),   --publisher
+('Robert', 'robert@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'as', TRUE, '2023-01-06', TRUE, TRUE), --publisher
+('Emily', 'emily@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',  'as', TRUE, '2023-01-07', FALSE, TRUE),
+('William', 'william@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'as', TRUE, '2023-01-08', FALSE, TRUE);
 
 -- Insert data into UserRole
 INSERT INTO UserRoles (UserId, RoleId)
 VALUES 
-(1, 3), -- Ali is a Customer
-(2, 3), -- Elyar is a Customer
-(3, 1), -- Admin is an Admin
-(4, 2), -- John is a Publisher
-(5, 2), -- Jane is a Publisher
-(6, 2), -- Robert is a Publisher
-(7, 3), -- Emily is a Customer
-(8, 3); -- William is a Customer
+(1, 2), -- Ali is a Customer
+(2, 2), -- Elyar is a Customer
+(3, 1), -- Admin is an Publisher
+(4, 1), -- John is a Publisher
+(5, 1), -- Jane is a Publisher
+(6, 1), -- Robert is a Publisher
+(7, 2), -- Emily is a Customer
+(8, 2); -- William is a Customer
 
 -- Insert data into Book here UserId is actually publisher's id
 INSERT INTO Books (UserId, BookName, AuthorName, ReleasedDate, BookCoverImage, Price, NumberOfPages, LanguageId, IsDelete)
@@ -228,7 +228,7 @@ VALUES
 (5, 'عشق در پاریس', 'ویلیام جانسون',2021, 'http://localhost:8080/book-covers/demo-5.jpg', 14000, 300, 4, FALSE);
 
 -- Insert data into Review
-INSERT INTO Reviews (User_Id, Book_Id, Rating, CreatedAt)
+INSERT INTO Reviews (UserId, BookId, Rating, CreatedAt)
 VALUES 
 (1, 1, 5, '2023-01-10 10:00:00'),
 (3, 2, 4, '2023-01-15 14:00:00'),
