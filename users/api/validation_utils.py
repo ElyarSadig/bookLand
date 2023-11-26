@@ -25,8 +25,31 @@ def is_email_valid(email):
 
 
 def password_match(password, password2):
-    # additional password validation
     return password == password2
+
+
+def is_password_valid(password):
+    error_message = ""
+    if len(password) < 8:
+        error_message = "رمز عبور باید حداقل ۸ کاراکتر باشد"
+
+    # At least one uppercase letter
+    if not any(char.isupper() for char in password):
+        error_message = "رمز عبور باید حداقل یک حرف بزرگ داشته باشد"
+
+    # At least one lowercase letter
+    if not any(char.islower() for char in password):
+        error_message = "رمز عبور باید حداقل یک حرف کوچک داشته باشد"
+
+    # At least one digit
+    if not any(char.isdigit() for char in password):
+        error_message = "رمز عبور باید حداقل دارای یک رقم باشد"
+
+    # At least one special character
+    if not re.search(r"[!@#$%^&*()-_=+{}|;:,.<>/?`~]", password):
+        error_message = "رمز عبور باید حداقل یک کاراکتر خاص داشته باشد"
+
+    return error_message
 
 
 def validate_iranian_phone_number(phone_number):
