@@ -3,6 +3,7 @@ import hashlib
 from .file_handler import process_and_upload_identity_path, process_and_upload_publications_image
 from datetime import datetime
 from .exceptions import EmailDoesNotExistError, ExpiredCodeError, InvalidCodeError
+import os
 
 
 class UserAuthenticationDBUtils:
@@ -10,7 +11,7 @@ class UserAuthenticationDBUtils:
     @classmethod
     def get_user_password_from_username_or_email(cls, identifier):
         query = """
-            SELECT Id, HashedPassword FROM public.Users
+            SELECT Id, HashedPassword, Salt FROM public.Users
             WHERE (username = %s OR email = %s)
             """
         with connection.cursor() as cursor:
@@ -21,8 +22,8 @@ class UserAuthenticationDBUtils:
             return result
 
     @classmethod
-    def password_match(cls, stored_password, password):
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    def password_match(cls, stored_password, password, salt):
+        hashed_password = hashlib.sha256((password + salt).encode()).hexdigest()
         return hashed_password == stored_password
 
 
@@ -30,14 +31,16 @@ class UserManagementDBUtils:
 
     @classmethod
     def create_user(cls, username, email, password, is_publisher=False, is_confirm=False):
-        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        salt = os.urandom(32).hex()
+        password_salt = password + salt
+        password_hash = hashlib.sha256(password_salt.encode()).hexdigest()
         query = """
-            INSERT INTO public.Users (Username, Email, HashedPassword, IsActive, IsPublisher, IsConfirm, RegistrationDate)
-            VALUES (%s, %s, %s, TRUE, %s, %s, NOW() + INTERVAL '3 hours 30 minutes')
+            INSERT INTO public.Users (Username, Email, HashedPassword, Salt, IsActive, IsPublisher, IsConfirm, RegistrationDate)
+            VALUES (%s, %s, %s, %s , TRUE, %s, %s, NOW() + INTERVAL '3 hours 30 minutes')
             RETURNING Id
             """
         with connection.cursor() as cursor:
-            cursor.execute(query, [username, email, password_hash, is_publisher, is_confirm])
+            cursor.execute(query, [username, email, password_hash, salt, is_publisher, is_confirm])
             return cursor.fetchone()[0]
 
     @classmethod
@@ -110,15 +113,18 @@ class UserManagementDBUtils:
 
     @classmethod
     def update_user_password(cls, password, email):
-        new_hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        salt = os.urandom(32).hex()
+        password_salt = password + salt
+        new_hashed_password = hashlib.sha256(password_salt.encode()).hexdigest()
         with connection.cursor() as cursor:
             cursor.execute(
                 """
                 UPDATE public.Users
-                SET HashedPassword = %s
+                SET HashedPassword = %s,
+                    Salt = %s
                 WHERE email = %s;
                 """,
-                [new_hashed_password, email]
+                [new_hashed_password, salt, email]
             )
 
 

@@ -1,9 +1,11 @@
 import hashlib
+import os
+
 from django.db import connection
 
 
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+def hash_password(password, salt):
+    return hashlib.sha256((password + salt).encode()).hexdigest()
 
 
 def info_dict(query, user_id):
@@ -18,28 +20,30 @@ def info_dict(query, user_id):
 class AccountManagementDBUtils:
 
     @classmethod
-    def get_user_stored_password(cls, user_id):
+    def get_user_stored_password_and_salt(cls, user_id):
         query = """
-                            SELECT HashedPassword FROM public.Users
-                            WHERE (id = %s)
-                            """
+                SELECT HashedPassword, Salt FROM public.Users
+                WHERE (id = %s)
+                """
         with connection.cursor() as cursor:
             cursor.execute(query, [user_id])
             stored_password = cursor.fetchone()[0]
+            salt = cursor.fetchone()[1]
 
-        return stored_password
+        return stored_password, salt
 
     @classmethod
     def update_password(cls, new_password, user_id):
-        hashed_newpassword = hash_password(new_password)
+        salt = os.urandom(32).hex()
+        hashed_newpassword = hash_password(new_password, salt)
         query = """
-                            UPDATE public.Users 
-                            SET HashedPassword = %s
-                            WHERE (id = %s)
-                            """
+                UPDATE public.Users 
+                SET HashedPassword = %s,
+                    Salt = %s
+                WHERE (id = %s)
+                """
         with connection.cursor() as cursor:
-            cursor.execute(query, [hashed_newpassword, user_id])
-
+            cursor.execute(query, [hashed_newpassword, salt, user_id])
 
     @classmethod
     def get_username_email(cls, user_id):
@@ -138,7 +142,7 @@ class AccountManagementDBUtils:
                      walletactions.createddate
                 FROM walletactions 
                 JOIN walletactiontypes ON walletactiontypes.id = walletactions.actiontypeid
-                WHERE userid = %s
+                WHERE userid = %s AND walletactions.issuccessful = TRUE
                 """
         with connection.cursor() as cursor:
             cursor.execute(query, [user_id])
