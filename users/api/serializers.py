@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from users.api.validation_utils import is_email_valid, is_username_valid, password_match, validate_iranian_phone_number
+from users.api.validation_utils import is_email_valid, is_username_valid, password_match, \
+    validate_iranian_phone_number, is_password_valid
 
 
 def validate_file_type(value):
@@ -32,6 +33,18 @@ class UserSignUpSerializer(serializers.Serializer):
                 "result": {
                     "error_code": "InvalidEmail",
                     "error_message": "ایمیل نامعتبر",
+                    "errors": ""
+                },
+                "data": "",
+            })
+
+        error_message = is_password_valid(password=attrs["password"])
+
+        if len(error_message) != 0:
+            raise serializers.ValidationError({
+                "result": {
+                    "error_code": "InvalidPassword",
+                    "error_message": error_message,
                     "errors": ""
                 },
                 "data": "",
@@ -137,6 +150,18 @@ class ResetPasswordSerializer(serializers.Serializer):
     password2 = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
+
+        error_message = is_password_valid(password=attrs["password"])
+
+        if len(error_message) != 0:
+            raise serializers.ValidationError({
+                "result": {
+                    "error_code": "InvalidPassword",
+                    "error_message": error_message,
+                    "errors": ""
+                },
+                "data": "",
+            })
 
         if not password_match(attrs["password"], attrs["password2"]):
             raise serializers.ValidationError({
