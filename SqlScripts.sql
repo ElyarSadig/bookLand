@@ -197,14 +197,14 @@ INSERT INTO Categories (Name) VALUES
 -- Insert data into User
 INSERT INTO Users (Username, Email, HashedPassword, Salt, IsActive, RegistrationDate, IsPublisher, IsConfirm)
 VALUES 
-('Ali', 'alitaami2002@gmail.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'as', TRUE, '2023-01-01', FALSE, TRUE),
-('Elyar', 'ElyarNejati@gmail.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8','as', TRUE, '2023-01-02', FALSE, TRUE),
-('Admin', 'alitaami81@gmail.com', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'as', TRUE, '2023-01-03', FALSE, TRUE),
-('John', 'john@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'as', TRUE, '2023-01-04', TRUE, TRUE),  --publisher
-('Jane', 'jane@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'as', TRUE, '2023-01-05', TRUE, TRUE),   --publisher
-('Robert', 'robert@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'as', TRUE, '2023-01-06', TRUE, TRUE), --publisher
-('Emily', 'emily@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',  'as', TRUE, '2023-01-07', FALSE, TRUE),
-('William', 'william@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'as', TRUE, '2023-01-08', FALSE, TRUE);
+('Ali', 'alitaami2002@gmail.com', '6733b7ffeace4887c3b31258079c780d8db3018db9cbc05c500df3521f968df8', 'abc', TRUE, '2023-01-01', FALSE, TRUE),
+('Elyar', 'ElyarNejati@gmail.com', '478a7da128a2875a1484798da2010d8f518ab4f341000da93c59fc5c201ded2c','def', TRUE, '2023-01-02', FALSE, TRUE),
+('AliTaami', 'alitaami81@gmail.com', '59a1ea0e7b558df84d247db20315c9e4b9bff7719ffaafd3150a3c529aa38d98', 'ghi', TRUE, '2023-01-03', FALSE, TRUE),
+('John', 'john@example.com', 'b77e3c94b3fbc99f22771482363dc0ea731113fb184e655d2ec9461e1c68519b', 'jkl', TRUE, '2023-01-04', TRUE, TRUE),  --publisher
+('Jane', 'jane@example.com', 'ebbf75fd13baaab8ce25b1d576efd9d071f8e95b8e8024035bb027a45604651e', 'mno', TRUE, '2023-01-05', TRUE, TRUE),   --publisher
+('Robert', 'robert@example.com', '5d6e996d4ef01c66b299460b84d470c585ac813064ce1b5616dbfb738e232d38', 'pqr', TRUE, '2023-01-06', TRUE, TRUE), --publisher
+('Emily', 'emily@example.com', '8d3c8ba9a36b65c7f050bec4d15dc1b05df668eddc2f80f8966f472c9483bd4c',  'stu', TRUE, '2023-01-07', FALSE, TRUE),
+('William', 'william@example.com', '706e7be8f614ea7a1cb90b90bebdcc865cb7793a89721cfd280c0ca6f6e17f57', 'vwx', TRUE, '2023-01-08', FALSE, TRUE);
 
 -- Insert data into UserRole
 INSERT INTO UserRoles (UserId, RoleId)
