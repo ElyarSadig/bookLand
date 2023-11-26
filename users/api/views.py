@@ -10,7 +10,7 @@ from .jwt_token import generate_jwt_token
 from .db_utils import UserActivityDBUtils, UserAuthenticationDBUtils, UserManagementDBUtils, UserRoleDBUtils
 from users.api.email_utils import send_email_background_task
 from .exceptions import *
-from accounts.api.jwt_auth import login_required
+from .jwt_token import publisher_login_required
 
 
 class PublisherSignUpView(GenericAPIView):
@@ -47,7 +47,7 @@ class PublisherSignUpView(GenericAPIView):
 class PublisherDetailsUpdateView(GenericAPIView):
     serializer_class = PublisherAdditionalInfoSerializer
 
-    @login_required
+    @publisher_login_required
     def put(self, request, user_id, role_id, *args, **kwargs):
         response = APIResult()
         serializer = PublisherAdditionalInfoSerializer(data=request.data)
@@ -74,7 +74,7 @@ class PublisherDetailsUpdateView(GenericAPIView):
 class PublisherImageUploadView(GenericAPIView):
     serializer_class = PublisherImageUploadSerializer
 
-    @login_required
+    @publisher_login_required
     def put(self, request, user_id, role_id, *args, **kwargs):
         response = APIResult()
         serializer = PublisherImageUploadSerializer(data=request.data)
