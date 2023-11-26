@@ -21,8 +21,9 @@ class ChangePasswordView(GenericAPIView):
             old_password = serializer.validated_data['old_password']
             new_password = serializer.validated_data['new_password']
 
-            stored_password = AccountManagementDBUtils.get_user_stored_password(user_id=user_id)
-            hashed_old_password = hash_password(old_password)
+            stored_password, salt = AccountManagementDBUtils.get_user_stored_password_and_salt(user_id=user_id)
+
+            hashed_old_password = hash_password(old_password, salt)
 
             if hashed_old_password == stored_password:
 
