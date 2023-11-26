@@ -33,9 +33,9 @@ class PublisherSignUpView(GenericAPIView):
 
             user_id = UserManagementDBUtils.create_user(username, email, password, is_publisher=True)
 
-            UserRoleDBUtils.assign_user_role(user_id, role_id=2)
+            UserRoleDBUtils.assign_user_role(user_id, role_id=1)
 
-            token = generate_jwt_token(user_id, role_id=2)
+            token = generate_jwt_token(user_id, role_id=1)
 
             response.api_result['data'] = token
 
@@ -110,9 +110,9 @@ class UserSignUpView(GenericAPIView):
 
             user_id = UserManagementDBUtils.create_user(username, email, password)
 
-            UserRoleDBUtils.assign_user_role(user_id, 3)
+            UserRoleDBUtils.assign_user_role(user_id, 2)
 
-            token = generate_jwt_token(user_id, role_id=3)
+            token = generate_jwt_token(user_id, role_id=2)
 
             response.api_result['data'] = token
 
@@ -134,9 +134,9 @@ class UserLoginView(GenericAPIView):
 
             password = serializer.validated_data['password']
 
-            user_id, stored_password = UserAuthenticationDBUtils.get_user_password_from_username_or_email(identifier)
+            user_id, stored_password, salt = UserAuthenticationDBUtils.get_user_password_from_username_or_email(identifier)
 
-            if not user_id or not UserAuthenticationDBUtils.password_match(stored_password, password):
+            if not user_id or not UserAuthenticationDBUtils.password_match(stored_password, password, salt):
                 raise InvalidUserCredentialsError()
 
             role_id = UserRoleDBUtils.get_user_role_id(user_id)
