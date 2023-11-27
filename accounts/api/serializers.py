@@ -8,7 +8,7 @@ class PasswordChangeSerializer(serializers.Serializer):
 
     def validate(self, attrs):
 
-        error_message = is_password_valid(password=attrs["password"])
+        error_message = is_password_valid(password=attrs["new_password"])
 
         if len(error_message) != 0:
             raise serializers.ValidationError({
