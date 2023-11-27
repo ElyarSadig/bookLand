@@ -27,8 +27,7 @@ class AccountManagementDBUtils:
                 """
         with connection.cursor() as cursor:
             cursor.execute(query, [user_id])
-            stored_password = cursor.fetchone()[0]
-            salt = cursor.fetchone()[1]
+            stored_password, salt = cursor.fetchone()
 
         return stored_password, salt
 
