@@ -62,8 +62,7 @@ CREATE TABLE Books (
     NumberOfPages INTEGER,
     LanguageId INTEGER REFERENCES Languages(Id),
     IsDelete BOOLEAN NOT NULL,
-    ReviewId INTEGER,
-    ReviewAverage DECIMAL(2,1)
+    ReviewId INTEGER REFERENCES Reviews(Id),
 );
 
 -- Review table
@@ -97,7 +96,8 @@ CREATE TABLE UserBookmarks (
     BookId INTEGER REFERENCES Books(Id),
     UserId INTEGER REFERENCES Users(Id),
     AddedTime TIMESTAMP,
-    IsDelete BOOLEAN
+    IsDelete BOOLEAN,
+    CONSTRAINT unique_user_bookmark UNIQUE (UserId, BookId)
 );
 
 -- Comments table
