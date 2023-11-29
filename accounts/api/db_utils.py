@@ -1,6 +1,5 @@
 import hashlib
 import os
-
 from django.db import connection
 
 
@@ -59,8 +58,7 @@ class AccountManagementDBUtils:
     @classmethod
     def get_user_bookmarks(cls, user_id):
         query = """
-                    SELECT
-                        userbookmarks.id as bookmarkid, 
+                    SELECT 
                         books.id as bookid,
                         users.publicationsname as publisher,
                         books.bookname,
@@ -104,14 +102,14 @@ class AccountManagementDBUtils:
         return info_dict(query=query, user_id=user_id)
 
     @classmethod
-    def update_user_bookmark(cls, user_id, bookmark_id):
+    def delete_user_bookmark(cls, user_id, book_id):
         query = """
                 Update public.UserBookMarks 
                 SET IsDelete = TRUE
-                WHERE UserId = %s AND Id = %s
+                WHERE UserId = %s AND BookId = %s
                 """
         with connection.cursor() as cursor:
-            cursor.execute(query, [user_id, bookmark_id])
+            cursor.execute(query, [user_id, book_id])
 
     @classmethod
     def get_total_successful_amount(cls, user_id):
@@ -162,3 +160,13 @@ class AccountManagementDBUtils:
             }
 
         return data
+
+    @classmethod
+    def add_book_to_user_bookmarks(cls, user_id, book_id):
+        query = """
+                INSERT INTO UserBookmarks (UserId, BookId, AddedTime, IsDelete)
+                VALUES (%s, %s, NOW() + INTERVAL '3 hours 30 minutes', FALSE)
+                ON CONFLICT (UserId, BookId) DO UPDATE SET IsDelete = FALSE;
+            """
+        with connection.cursor() as cursor:
+            cursor.execute(query, [user_id, book_id])
