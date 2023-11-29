@@ -62,7 +62,7 @@ CREATE TABLE Books (
     NumberOfPages INTEGER,
     LanguageId INTEGER REFERENCES Languages(Id),
     IsDelete BOOLEAN NOT NULL,
-    ReviewId INTEGER REFERENCES Reviews(Id),
+    ReviewId INTEGER
 );
 
 -- Review table
