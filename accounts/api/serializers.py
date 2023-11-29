@@ -23,3 +23,7 @@ class PasswordChangeSerializer(serializers.Serializer):
         return attrs
 
 
+class UserBookmarkSerializer(serializers.Serializer):
+    book_id = serializers.IntegerField()
+
+
