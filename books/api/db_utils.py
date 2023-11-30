@@ -27,28 +27,48 @@ class BookManagementDBUtils:
                     b.description,
                     b.numberofpages,
                     l.name as language,
-                    ROUND(COALESCE(AVG(r.review_average), 0), 1) as reviewaverage,
-                    COALESCE(r.reviewcount, 0) as reviewcount,
                     bf.bookdemofile
                 FROM books b
-                LEFT JOIN users u ON u.id = b.userid
-                LEFT JOIN languages l ON b.languageid = l.id
-                LEFT JOIN bookfiles bf ON b.id = bf.bookid
-                LEFT JOIN (
-                    SELECT
-                        bookid,
-                        AVG(rating) as review_average,
-                        COUNT(*) as reviewcount
-                    FROM reviews
-                    GROUP BY bookid
-                ) r ON b.id = r.bookid
+                INNER JOIN users u ON u.id = b.userid
+                INNER JOIN languages l ON b.languageid = l.id
+                INNER JOIN bookfiles bf ON b.id = bf.bookid
                 WHERE b.id = %s
-                GROUP BY
-                    b.id,
-                    u.publicationsname,
-                    l.name,
-                    bf.bookdemofile,
-                    r.review_average,
-                    r.reviewcount;
                 """
         return info_dict(query=query, list_of_args=[book_id])
+
+    @classmethod
+    def get_book_review_counts(cls, book_id):
+        query = """
+            SELECT
+                ROUND(COALESCE(AVG(r.rating), 0), 1) as reviewaverage,
+                COALESCE(COUNT(r.rating), 0) as reviewcount
+            FROM books b
+            INNER JOIN (
+                SELECT
+                    bookid,
+                    rating
+                FROM reviews
+            ) r ON b.id = r.bookid
+            WHERE b.id = %s
+            GROUP BY
+                b.id;
+        """
+        return info_dict(query=query, list_of_args=[book_id])
+
+
+    @classmethod
+    def get_book_categories(cls, book_id):
+        query = """
+            SELECT
+                c.name as category_name
+            FROM books b
+            INNER JOIN bookcategories bc ON b.id = bc.bookid
+            INNER JOIN categories c ON bc.categoryid = c.id
+            WHERE b.id = %s;
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(query, [book_id])
+            results = cursor.fetchall()
+            return results
+
