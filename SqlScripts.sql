@@ -298,7 +298,8 @@ VALUES
 
 -- Insert data into Discount
 INSERT INTO Discounts (Code, Quantity, Percent, CreatedDate, ExpireDate, IsDelete)
-VALUES 
+VALUES
+('welcome', 10000, 30.00, '2023-01-01', '2030-12-31', FALSE),
 ('DISCOUNT10', 100, 10.00, '2023-01-01', '2023-12-31', FALSE),
 ('DISCOUNT15', 50, 15.00, '2023-01-01', '2023-06-30', FALSE),
 ('DISCOUNT20', 75, 20.00, '2023-01-01', '2023-12-31', FALSE);
