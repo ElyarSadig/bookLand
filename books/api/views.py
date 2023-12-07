@@ -28,9 +28,12 @@ class BookReviewsView(GenericAPIView):
         data = BookManagementDBUtils.get_book_review_counts(book_id)
 
         if len(data) == 0:
-            return Response(response.api_result, status=status.HTTP_404_NOT_FOUND)
-
-        response.api_result['data'] = data
+            response.api_result['data'] = [{
+                "reviewaverage": 0,
+                "reviewcount": 0
+            }]
+        else:
+            response.api_result['data'] = data
 
         return Response(response.api_result, status=status.HTTP_200_OK)
 
