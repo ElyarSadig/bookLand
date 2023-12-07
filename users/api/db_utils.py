@@ -18,7 +18,7 @@ class UserAuthenticationDBUtils:
             cursor.execute(query, [identifier, identifier])
             result = cursor.fetchone()
             if result is None:
-                return None, None
+                return None, None, None
             return result
 
     @classmethod
