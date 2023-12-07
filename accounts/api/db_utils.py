@@ -114,7 +114,9 @@ class AccountManagementDBUtils:
     @classmethod
     def get_total_successful_amount(cls, user_id):
         query = """
-            SELECT SUM(Amount) AS total_amount
+            SELECT
+                SUM(CASE WHEN ActionTypeId = 1 THEN Amount ELSE 0 END) AS total_deposit,
+                SUM(CASE WHEN ActionTypeId = 2 THEN Amount ELSE 0 END) AS total_withdraw
             FROM public.WalletActions
             WHERE UserId = %s AND IsSuccessful = TRUE;
         """
@@ -123,7 +125,10 @@ class AccountManagementDBUtils:
             cursor.execute(query, [user_id])
             result = cursor.fetchone()
 
-        total_amount = result[0] if result and result[0] is not None else 0.0
+            total_deposit = result[0] if result and result[0] is not None else 0.0
+            total_withdraw = result[1] if result and result[1] is not None else 0.0
+
+        total_amount = total_deposit - total_withdraw
 
         return total_amount
 
