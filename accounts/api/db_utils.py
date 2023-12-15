@@ -67,7 +67,6 @@ class AccountManagementDBUtils:
                         books.releaseddate,
                         books.bookcoverimage,
                         books.price,
-                        books.description,
                         books.numberofpages,
                         languages.name as language
                     FROM userbookmarks
@@ -90,7 +89,6 @@ class AccountManagementDBUtils:
                     books.releaseddate,
                     books.bookcoverimage,
                     books.price,
-                    books.description,
                     books.numberofpages,
                     languages.name as language
                 FROM books
