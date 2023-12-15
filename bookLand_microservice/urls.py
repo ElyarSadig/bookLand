@@ -25,6 +25,7 @@ urlpatterns = [
     #    path('admin/', admin.site.urls),
     path("ping/", users.views.ping, name="ping"),
     path('api/books/', include('books.api.urls')),
+    path('api/publisher/', include('publishers.api.urls')),
     path("api/user/", include("accounts.api.urls")),
     path("api/auth/", include("users.api.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

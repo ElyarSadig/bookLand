@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'users',
     'books',
     'accounts',
+    'publishers',
 
     "rest_framework",
     "drf_spectacular",
