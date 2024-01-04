@@ -32,6 +32,8 @@ def upload_to_file_server(file, postfix):
     if response.status_code == 200:
         return "http://localhost:8080" + postfix + "/" + file_name
 
+    return ""
+
 
 
 

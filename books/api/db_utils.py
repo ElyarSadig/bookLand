@@ -72,3 +72,26 @@ class BookManagementDBUtils:
             results = cursor.fetchall()
             return results
 
+    @classmethod
+    def has_user_bought_book(cls, user_id, book_id):
+        query = """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM public.UserBooks
+                    WHERE UserId = %s AND BookId = %s
+                ) AS has_bought
+            """
+
+        with connection.cursor() as cursor:
+            cursor.execute(query, [user_id, book_id])
+            result = cursor.fetchone()
+            return result[0]
+
+    @classmethod
+    def get_original_book_filepath(cls, book_id):
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT BookOriginalFile FROM BookFiles WHERE BookId = %s;", [book_id])
+            result = cursor.fetchone()
+
+            return result[0]
+
