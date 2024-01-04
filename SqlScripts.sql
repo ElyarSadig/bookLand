@@ -61,7 +61,8 @@ CREATE TABLE Books (
     Description TEXT,
     NumberOfPages INTEGER,
     LanguageId INTEGER REFERENCES Languages(Id),
-    IsDelete BOOLEAN NOT NULL
+    IsDelete BOOLEAN NOT NULL,
+    CreatedDateTime TIMESTAMP
 );
 
 -- Review table
@@ -254,22 +255,22 @@ VALUES
 -- Insert data into BookFiles
 INSERT INTO BookFiles (BookId, BookDemoFile, BookOriginalFile)
 VALUES
-(1, 'path_to_demo_file1', 'path_to_original_file1'),
-(2, 'path_to_demo_file2', 'path_to_original_file2'),
-(3, 'path_to_demo_file3', 'path_to_original_file3'),
-(4, 'path_to_demo_file4', 'path_to_original_file4'),
-(5, 'path_to_demo_file5', 'path_to_original_file5'),
-(6, 'path_to_demo_file5', 'path_to_original_file5'),
-(7, 'path_to_demo_file5', 'path_to_original_file5'),
-(8, 'path_to_demo_file5', 'path_to_original_file5'),
-(9, 'path_to_demo_file5', 'path_to_original_file5'),
-(10, 'path_to_demo_file5', 'path_to_original_file5'),
-(11, 'path_to_demo_file5', 'path_to_original_file5'),
-(12, 'path_to_demo_file5', 'path_to_original_file5'),
-(13, 'path_to_demo_file5', 'path_to_original_file5'),
-(14, 'path_to_demo_file5', 'path_to_original_file5'),
-(15, 'path_to_demo_file5', 'path_to_original_file5'),
-(16, 'path_to_demo_file5', 'path_to_original_file5');
+(1, 'http://localhost:8080/books/demo-1.pdf', 'http://localhost:8080/books/original-1.pdf'),
+(2, 'http://localhost:8080/books/demo-2.pdf', 'http://localhost:8080/books/original-2.pdf'),
+(3, 'http://localhost:8080/books/demo-3.pdf', 'http://localhost:8080/books/original-3.pdf'),
+(4, 'http://localhost:8080/books/demo-4.pdf', 'http://localhost:8080/books/original-4.pdf'),
+(5, 'http://localhost:8080/books/demo-5.pdf', 'http://localhost:8080/books/original-5.pdf'),
+(6, 'http://localhost:8080/books/demo-6.pdf', 'http://localhost:8080/books/original-6.pdf'),
+(7, 'http://localhost:8080/books/demo-7.pdf', 'http://localhost:8080/books/original-7.pdf'),
+(8, 'http://localhost:8080/books/demo-8.pdf', 'http://localhost:8080/books/original-8.pdf'),
+(9, 'http://localhost:8080/books/demo-9.pdf', 'http://localhost:8080/books/original-9.pdf'),
+(10, 'http://localhost:8080/books/demo-10.pdf', 'http://localhost:8080/books/original-10.pdf'),
+(11, 'http://localhost:8080/books/demo-11.pdf', 'http://localhost:8080/books/original-11.pdf'),
+(12, 'http://localhost:8080/books/demo-12.pdf', 'http://localhost:8080/books/original-12.pdf'),
+(13, 'http://localhost:8080/books/demo-13.pdf', 'http://localhost:8080/books/original-13.pdf'),
+(14, 'http://localhost:8080/books/demo-14.pdf', 'http://localhost:8080/books/original-14.pdf'),
+(15, 'http://localhost:8080/books/demo-15.pdf', 'http://localhost:8080/books/original-15.pdf'),
+(16, 'http://localhost:8080/books/demo-16.pdf', 'http://localhost:8080/books/original-16.pdf');
 
 -- Insert data into UserBooks
 INSERT INTO UserBooks (BookId, UserId, BoughtTime)
