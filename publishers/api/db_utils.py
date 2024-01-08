@@ -112,8 +112,14 @@ class AccountManagementDBUtils:
             FROM public.WalletActions
             WHERE UserId = %s AND IsSuccessful = TRUE;
                 """
-
-        return info_dict(query, user_id)
+        with connection.cursor() as cursor:
+            cursor.execute(query, [user_id])
+            results = cursor.fetchone()
+            data = {
+                "deposit": results[0],
+                "withdraw": results[1]
+            }
+            return data
 
 
     @classmethod
