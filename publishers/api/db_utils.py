@@ -7,13 +7,20 @@ def hash_password(password, salt):
     return hashlib.sha256((password + salt).encode()).hexdigest()
 
 
-def info_dict(query, user_id):
+def info_list_dict(query, user_id):
     with connection.cursor() as cursor:
         cursor.execute(query, [user_id])
         results = cursor.fetchall()
         data = [dict(zip([col[0] for col in cursor.description], row)) for row in results]
 
     return data
+
+
+def info_dict(query, user_id):
+    with connection.cursor() as cursor:
+        cursor.execute(query, [user_id])
+        result = cursor.fetchone()
+        return dict(zip([col[0] for col in cursor.description], result))
 
 
 class AccountManagementDBUtils:
@@ -84,7 +91,7 @@ class AccountManagementDBUtils:
             WHERE u.id = %s;
         """
 
-        return info_dict(query, user_id)
+        return info_list_dict(query, user_id)
 
     @classmethod
     def get_publisher_wallet_history(cls, user_id):
@@ -100,7 +107,7 @@ class AccountManagementDBUtils:
                     JOIN walletactiontypes ON walletactiontypes.id = walletactions.actiontypeid
                     WHERE userid = %s AND walletactions.issuccessful = TRUE
                     """
-        return info_dict(query, user_id)
+        return info_list_dict(query, user_id)
 
 
     @classmethod
@@ -112,14 +119,7 @@ class AccountManagementDBUtils:
             FROM public.WalletActions
             WHERE UserId = %s AND IsSuccessful = TRUE;
                 """
-        with connection.cursor() as cursor:
-            cursor.execute(query, [user_id])
-            results = cursor.fetchone()
-            data = {
-                "deposit": results[0],
-                "withdraw": results[1]
-            }
-            return data
+        return info_dict(query, user_id)
 
 
     @classmethod
