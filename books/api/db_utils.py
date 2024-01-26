@@ -26,13 +26,16 @@ class BookManagementDBUtils:
                     b.price,
                     b.description,
                     b.numberofpages,
+                    c.name as category,
                     l.name as language,
                     bf.bookdemofile
                 FROM books b
                 INNER JOIN users u ON u.id = b.userid
                 INNER JOIN languages l ON b.languageid = l.id
                 INNER JOIN bookfiles bf ON b.id = bf.bookid
-                WHERE b.id = %s
+                INNER JOIN bookcategories bc ON b.id = bc.bookid
+                INNER JOIN categories c ON c.id = bc.categoryid
+                WHERE b.id = %s AND b.isdelete = FALSE
                 """
         return info_dict(query=query, list_of_args=[book_id])
 
