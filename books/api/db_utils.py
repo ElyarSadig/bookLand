@@ -13,6 +13,20 @@ def info_dict(query, list_of_args):
 class BookManagementDBUtils:
 
     @classmethod
+    def get_all_languages(cls):
+        query = """
+            SELECT * FROM Languages
+        """
+        return info_dict(query, [])
+
+    @classmethod
+    def get_all_categories(cls):
+        query = """
+            SELECT * FROM Categories        
+        """
+        return info_dict(query, [])
+
+    @classmethod
     def get_book_detail(cls, book_id):
         query = """
                 SELECT

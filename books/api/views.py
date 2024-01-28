@@ -70,3 +70,27 @@ class OriginalBookFileView(GenericAPIView):
         response.api_result['data'] = original_book_file_path
 
         return Response(response.api_result, status=status.HTTP_200_OK)
+
+
+class CategoriesView(GenericAPIView):
+
+    def get(self, request, *args, **kwargs):
+        response = APIResult()
+
+        categories = BookManagementDBUtils.get_all_categories()
+
+        response.api_result['data'] = categories
+
+        return Response(response.api_result, status=status.HTTP_200_OK)
+
+
+class LanguagesView(GenericAPIView):
+
+    def get(self, request, *args, **kwargs):
+        response = APIResult()
+
+        languages = BookManagementDBUtils.get_all_languages()
+
+        response.api_result['data'] = languages
+
+        return Response(response.api_result, status=status.HTTP_200_OK)
