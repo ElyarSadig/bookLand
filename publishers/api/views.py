@@ -1,5 +1,5 @@
 from rest_framework.generics import GenericAPIView
-from .serializers import PasswordChangeSerializer, UpdatePublisherProfileSerializer
+from .serializers import PasswordChangeSerializer, UpdatePublisherProfileSerializer, CreateBookSerializer
 from .jwt_auth import login_required
 from users.api.api_result import APIResult
 from accounts.api.exceptions import *
@@ -47,6 +47,37 @@ class PublisherBooksView(GenericAPIView):
 
         return Response(response.api_result, status=status.HTTP_200_OK)
 
+    @login_required
+    def post(self, request, user_id, role_id, *args, **kwargs):
+        response = APIResult()
+        balance = AccountManagementDBUtils.get_total_successful_amount(user_id)
+
+        if balance < 5000:
+            response.api_result["result"]["error_code"] = "NotEnoghBalanceError"
+            response.api_result["result"]["error_message"] = "ناشر عزیز موجودی حساب شما برای ایجاد کتاب کافی نیست"
+            return Response(response.api_result, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = CreateBookSerializer(data=request.data)
+
+        if serializer.is_valid():
+            validated_data = serializer.validated_data
+
+            AccountManagementDBUtils.create_book(user_id, validated_data)
+
+            return Response(response.api_result, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @login_required
+    def delete(self, request, user_id, role_id, *args, **kwargs):
+        response = APIResult()
+
+        book_id = kwargs.get('book_id')
+
+        AccountManagementDBUtils.delete_publisher_book(user_id, book_id)
+
+        return Response(response.api_result, status=status.HTTP_200_OK)
+
 
 class PublisherProfileView(GenericAPIView):
 
@@ -79,7 +110,6 @@ class PublisherProfileView(GenericAPIView):
             return Response(response.api_result, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class PublisherWalletHistory(GenericAPIView):

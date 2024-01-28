@@ -16,6 +16,14 @@ def process_and_upload_publications_image(file_path, postfix="/publications"):
     return upload_to_file_server(file_path, postfix)
 
 
+def process_and_upload_book_cover_image(file_path, postfix="/book_covers"):
+    return upload_to_file_server(file_path, postfix)
+
+
+def process_and_upload_book(file_path, postfix="/books"):
+    return upload_to_file_server(file_path, postfix)
+
+
 def upload_to_file_server(file, postfix):
     file_name = generate_uuid() + '_' + file.name
     file_server_url = config('FILE_SERVER', default='http://localhost:8080')
@@ -26,7 +34,7 @@ def upload_to_file_server(file, postfix):
         file_server_url + "/upload" + postfix,
         files=files,
         headers={'Authorization': auth_token},
-        timeout=1
+        timeout=10
     )
 
     if response.status_code == 200:

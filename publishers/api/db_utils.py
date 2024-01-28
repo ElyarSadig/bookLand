@@ -1,7 +1,7 @@
 import hashlib
 import os
 from django.db import connection
-
+from users.api.file_handler import process_and_upload_book, process_and_upload_book_cover_image
 
 def hash_password(password, salt):
     return hashlib.sha256((password + salt).encode()).hexdigest()
@@ -24,6 +24,83 @@ def info_dict(query, user_id):
 
 
 class AccountManagementDBUtils:
+
+    @classmethod
+    def get_total_successful_amount(cls, user_id):
+        query = """
+                SELECT
+                    SUM(CASE WHEN ActionTypeId = 1 THEN Amount ELSE 0 END) AS total_deposit,
+                    SUM(CASE WHEN ActionTypeId = 2 THEN Amount ELSE 0 END) AS total_withdraw
+                FROM public.WalletActions
+                WHERE UserId = %s AND IsSuccessful = TRUE;
+            """
+
+        with connection.cursor() as cursor:
+            cursor.execute(query, [user_id])
+            result = cursor.fetchone()
+
+            total_deposit = result[0] if result and result[0] is not None else 0.0
+            total_withdraw = result[1] if result and result[1] is not None else 0.0
+
+        total_amount = total_deposit - total_withdraw
+
+        return total_amount
+
+    @classmethod
+    def create_book(cls, user_id, data):
+
+        book_cover_image = process_and_upload_book_cover_image(data['book_cover_image'])
+        book_demo_file = process_and_upload_book(data['book_demo_file'])
+        book_original_file = process_and_upload_book(data['book_original_file'])
+
+        query = """
+            INSERT INTO Books 
+                    (BookName, AuthorName, TranslatorName, ReleasedDate, 
+                       BookCoverImage, Price, Description, NumberOfPages, LanguageId,
+                       UserId, IsDelete, CreatedDateTime)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, FALSE, NOW() + INTERVAL '3 hours 30 minutes') RETURNING Id
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(query, [
+                    data['book_name'], data['author_name'], data['translator_name'],
+                    data['released_date'], book_cover_image, data['price'],
+                    data['description'], data['number_of_pages'], data['language_id'],
+                    user_id
+                ])
+            new_book_id = cursor.fetchone()[0]
+
+            query = """
+                INSERT INTO BookCategories (CategoryId, BookId, IsDelete) VALUES (%s, %s, FALSE)
+            """
+
+            cursor.execute(query, [data["category_id"], new_book_id])
+
+            query = """
+                INSERT INTO BookFiles (BookDemoFile, BookOriginalFile, BookId) VALUES (%s, %s, %s)
+            """
+
+            cursor.execute(query, [book_demo_file, book_original_file, new_book_id])
+
+            description = f' ایجاد کتاب{data["book_name"]}'
+
+            query = """
+                INSERT INTO WalletActions (ActionTypeId, UserId, Amount, IsSuccessful, Description, CreatedDate)
+                VALUES (2, %s, 5000, TRUE, %s, NOW() + INTERVAL '3 hours 30 minutes')
+            """
+
+            cursor.execute(query, [user_id, description])
+
+
+    @classmethod
+    def delete_publisher_book(cls, user_id, book_id):
+        query = """
+            UPDATE public.Books 
+                SET IsDelete = TRUE
+            WHERE (id = %s AND userid = %s)
+        """
+        with connection.cursor() as cursor:
+            cursor.execute(query, [book_id, user_id])
 
     @classmethod
     def get_user_stored_password_and_salt(cls, user_id):
