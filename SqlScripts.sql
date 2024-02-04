@@ -322,7 +322,7 @@ VALUES
 (1, 9, FALSE),
 (2, 10, FALSE),
 (16, 11, FALSE),
-(16, 12, FALSE),
+(16, 10, FALSE),
 (8, 13, FALSE),
 (5, 14, FALSE),
 (3, 15, FALSE);
