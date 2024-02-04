@@ -22,7 +22,7 @@ from django.contrib import admin
 import users.views
 
 urlpatterns = [
-    #    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path("ping/", users.views.ping, name="ping"),
     path('api/books/', include('books.api.urls')),
     path('api/publisher/', include('publishers.api.urls')),

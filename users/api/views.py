@@ -5,14 +5,21 @@ from users.api.serializers import UserSignUpSerializer, LoginSerializer, SendEma
     ResetPasswordSerializer, PublisherAdditionalInfoSerializer, \
     PublisherImageUploadSerializer
 from .api_result import APIResult
-from users.api.utils import generate_random_code
 from .jwt_token import generate_jwt_token
-from .db_utils import UserActivityDBUtils, UserAuthenticationDBUtils, UserManagementDBUtils, UserRoleDBUtils
 from users.api.email_utils import send_email_background_task
-from .exceptions import *
 from .jwt_token import publisher_login_required
+from users.models import UserActivityCode, User, UserRole
+from datetime import datetime
+from drf_spectacular.utils import extend_schema
+from django.shortcuts import get_object_or_404
 
 
+def error_response(api_result, error_message, status_code):
+    api_result["result"]["error_message"] = error_message
+    return Response(api_result, status=status_code)
+
+
+@extend_schema(tags=["users"])
 class PublisherSignUpView(GenericAPIView):
     serializer_class = UserSignUpSerializer
 
@@ -25,17 +32,19 @@ class PublisherSignUpView(GenericAPIView):
             email = serializer.validated_data['email']
             password = serializer.validated_data['password']
 
-            if UserManagementDBUtils.username_exists(username):
-                raise UsernameAlreadyExistsError()
+            if User.objects.filter(username=username).exists():
+                return error_response(response.api_result, error_message="نام کاربری قبلا ثبت شده است.", status_code=status.HTTP_400_BAD_REQUEST)
 
-            if UserManagementDBUtils.email_exists(email):
-                raise EmailAlreadyExistsError()
+            if User.objects.filter(email=email).exists():
+                return error_response(response.api_result, error_message="ایمیل قبلا ثبت شده است.", status_code=status.HTTP_400_BAD_REQUEST)
 
-            user_id = UserManagementDBUtils.create_user(username, email, password, is_publisher=True)
+            user = User.objects.create(username=username, email=email, is_publisher=True, is_confirm=False)
 
-            UserRoleDBUtils.assign_user_role(user_id, role_id=1)
+            user.set_password(password)
 
-            token = generate_jwt_token(user_id, role_id=1)
+            role_id = UserRole.assign_publisher_role(user.id)
+
+            token = generate_jwt_token(user.id, role_id)
 
             response.api_result['data'] = token
 
@@ -44,6 +53,7 @@ class PublisherSignUpView(GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(tags=["users"])
 class PublisherDetailsUpdateView(GenericAPIView):
     serializer_class = PublisherAdditionalInfoSerializer
 
@@ -58,19 +68,26 @@ class PublisherDetailsUpdateView(GenericAPIView):
             card_number = serializer.validated_data["card_number"]
             address = serializer.validated_data["address"]
 
-            if UserManagementDBUtils.publications_name_exists(publications_name):
-                raise PublicationsNameAlreadyExistsError()
+            user = get_object_or_404(User, id=user_id)
 
-            if UserManagementDBUtils.phone_number_exists(phone_number):
-                raise PhoneNumberAlreadyExistsError()
+            if User.objects.exclude(id=user_id).filter(publications_name=publications_name).exists():
+                return error_response(response.api_result, error_message="نام تجاری قبلا ثبت شده است", status_code=status.HTTP_400_BAD_REQUEST)
 
-            UserManagementDBUtils.update_publisher_info(user_id, phone_number, publications_name, card_number, address)
+            if User.objects.exclude(id=user_id).filter(phone_number=phone_number).exists():
+                return error_response(response.api_result, error_message="شماره همراه قبلا ثبت شده است", status_code=status.HTTP_400_BAD_REQUEST)
+
+            user.phone_number = phone_number
+            user.publications_name = publications_name
+            user.card_number = card_number
+            user.address = address
+            user.save()
 
             return Response(response.api_result, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(tags=["users"])
 class PublisherImageUploadView(GenericAPIView):
     serializer_class = PublisherImageUploadSerializer
 
@@ -83,13 +100,14 @@ class PublisherImageUploadView(GenericAPIView):
             publications_image = serializer.validated_data['publications_image']
             identity_image = serializer.validated_data['identity_image']
 
-            UserManagementDBUtils.update_publisher_files(user_id, publications_image, identity_image)
+            User.update_publisher_files(user_id, publications_image, identity_image)
 
             return Response(response.api_result, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(tags=["users"])
 class UserSignUpView(GenericAPIView):
     serializer_class = UserSignUpSerializer
 
@@ -102,17 +120,18 @@ class UserSignUpView(GenericAPIView):
             email = serializer.validated_data['email']
             password = serializer.validated_data['password']
 
-            if UserManagementDBUtils.username_exists(username):
-                raise UsernameAlreadyExistsError()
+            if User.objects.filter(username=username).exists():
+                return error_response(response.api_result, error_message="نام کاربری قبلا ثبت شده است.", status_code=status.HTTP_400_BAD_REQUEST)
 
-            if UserManagementDBUtils.email_exists(email):
-                raise EmailAlreadyExistsError()
+            if User.objects.filter(email=email).exists():
+                return error_response(response.api_result, error_message="ایمیل قبلا ثبت شده است", status_code=status.HTTP_400_BAD_REQUEST)
 
-            user_id = UserManagementDBUtils.create_user(username, email, password)
+            user = User.objects.create(email=email, username=username, is_publisher=False, is_confirm=False)
+            user.set_password(password)
 
-            UserRoleDBUtils.assign_user_role(user_id, 2)
+            role_id = UserRole.assign_customer_role(user.id)
 
-            token = generate_jwt_token(user_id, role_id=2)
+            token = generate_jwt_token(user.id, role_id)
 
             response.api_result['data'] = token
 
@@ -121,6 +140,7 @@ class UserSignUpView(GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(tags=["users"])
 class UserLoginView(GenericAPIView):
     serializer_class = LoginSerializer
 
@@ -129,19 +149,22 @@ class UserLoginView(GenericAPIView):
         serializer = LoginSerializer(data=request.data)
 
         if serializer.is_valid():
-
             identifier = serializer.validated_data['email_or_username']
-
             password = serializer.validated_data['password']
 
-            user_id, stored_password, salt = UserAuthenticationDBUtils.get_user_password_from_username_or_email(identifier)
+            user = User.objects.filter(username=identifier) | User.objects.filter(email=identifier)
 
-            if not user_id or not UserAuthenticationDBUtils.password_match(stored_password, password, salt):
-                raise InvalidUserCredentialsError()
+            if not user.exists():
+                return Response(status=status.HTTP_400_BAD_REQUEST)
 
-            role_id = UserRoleDBUtils.get_user_role_id(user_id)
+            user = user.first()
 
-            token = generate_jwt_token(user_id, role_id)
+            if not user.password_valid(password):
+                return error_response(response.api_result, error_message="کاربر با این اطلاعات وجود ندارد.", status_code=status.HTTP_400_BAD_REQUEST)
+
+            role_id = UserRole.get_user_role_id(user.id)
+
+            token = generate_jwt_token(user.id, role_id)
 
             response.api_result['data'] = token
 
@@ -150,6 +173,7 @@ class UserLoginView(GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(tags=["users"])
 class SendSignUpEmailView(GenericAPIView):
     serializer_class = SendEmailSerializer
 
@@ -160,22 +184,21 @@ class SendSignUpEmailView(GenericAPIView):
         if serializer.is_valid():
             email = serializer.validated_data["email"]
 
-            if UserManagementDBUtils.email_exists(email):
-                raise EmailAlreadyExistsError()
+            if User.objects.filter(email=email).exists():
+                return error_response(response.api_result, error_message="ایمیل قبلا ثبت شده است.", status_code=status.HTTP_400_BAD_REQUEST)
 
-            activation_code = generate_random_code()
-
-            UserActivityDBUtils.create_user_activity_code(email, activation_code)
+            user_activity = UserActivityCode.create_user_activity_code(email)
 
             subject = "فعال سازی حساب کاربری"
             template = "users/email_signup.html"
-            send_email_background_task(subject, template, activation_code, email)
+            send_email_background_task(subject, template, user_activity.activity_code, email)
 
             return Response(response.api_result, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(tags=["users"])
 class VerifyEmailCodeView(GenericAPIView):
     serializer_class = VerifyEmailCodeSerializer
 
@@ -187,13 +210,15 @@ class VerifyEmailCodeView(GenericAPIView):
             email = serializer.validated_data['email']
             activation_code = serializer.validated_data['activation_code']
 
-            UserActivityDBUtils.validate_activation_code(email, activation_code)
+            if not UserActivityCode.valid_user_activity_code(email, activation_code):
+                return error_response(response.api_result, error_message="کد وارد شده نا معتبر است.", status_code=status.HTTP_400_BAD_REQUEST)
 
             return Response(response.api_result, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(tags=["users"])
 class SendPasswordResetCodeView(GenericAPIView):
     serializer_class = SendEmailSerializer
 
@@ -204,28 +229,26 @@ class SendPasswordResetCodeView(GenericAPIView):
         if serializer.is_valid():
             email = serializer.validated_data["email"]
 
-            if not UserManagementDBUtils.email_exists(email):
-                raise EmailDoesNotExistError()
+            if not User.objects.filter(email=email).exists():
+                return error_response(response.api_result, error_message="ایمیل وجود ندارد.", status_code=status.HTTP_400_BAD_REQUEST)
 
-            code = generate_random_code()
-
-            UserActivityDBUtils.create_user_activity_code(email, code)
+            user_activity = UserActivityCode.create_user_activity_code(email)
 
             subject = "بازیابی رمز عبور"
             template = "users/reset_password_email.html"
-            send_email_background_task(subject, template, code, email)
+            send_email_background_task(subject, template, user_activity.activity_code, email)
 
             return Response(response.api_result, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(tags=["users"])
 class PasswordResetView(GenericAPIView):
     serializer_class = ResetPasswordSerializer
 
     def post(self, request):
         response = APIResult()
-
         serializer = ResetPasswordSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -233,9 +256,21 @@ class PasswordResetView(GenericAPIView):
             activation_code = serializer.validated_data['activation_code']
             password = serializer.validated_data['password']
 
-            UserActivityDBUtils.validate_activation_code(email, activation_code)
+            latest_code = UserActivityCode.objects.filter(email=email).latest('created_date_time')
 
-            UserManagementDBUtils.update_user_password(password, email)
+            if latest_code is None:
+                return error_response(response.api_result, error_message="کد وارد شده نامعتبر است.", status_code=status.HTTP_400_BAD_REQUEST)
+
+            current_datetime = datetime.now()
+
+            if current_datetime > latest_code.expire_date_time:
+                return error_response(response.api_result, error_message="به علت تاخیر زیاد دسترسی وجود ندارد. دوباره امتحان کنید", status_code=status.HTTP_400_BAD_REQUEST)
+
+            if latest_code.activity_code != activation_code:
+                return error_response(response.api_result, error_message="کد وارد شده نامعتبر است.", status_code=status.HTTP_400_BAD_REQUEST)
+
+            user = User.objects.get(email=email)
+            user.set_password(password)
 
             return Response(response.api_result, status=status.HTTP_200_OK)
 

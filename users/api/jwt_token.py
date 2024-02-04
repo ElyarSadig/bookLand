@@ -12,7 +12,7 @@ def generate_jwt_token(user_id, role_id):
     token_payload = {
         "user_id": user_id,
         "role_id": role_id,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=4)
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
     }
 
     token = jwt.encode(token_payload, secret_key, algorithm="HS256")

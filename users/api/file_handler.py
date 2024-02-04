@@ -16,7 +16,7 @@ def process_and_upload_publications_image(file_path, postfix="/publications"):
     return upload_to_file_server(file_path, postfix)
 
 
-def process_and_upload_book_cover_image(file_path, postfix="/book_covers"):
+def process_and_upload_book_cover_image(file_path, postfix="/book-covers"):
     return upload_to_file_server(file_path, postfix)
 
 
