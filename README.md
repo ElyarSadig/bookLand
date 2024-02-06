@@ -1,12 +1,17 @@
-### Introduction to BookLand: Online Book Reading Platform
+### Online Book Reading Platform
 
 Welcome to BookLand, your premier destination for accessing a vast library of books and enjoying a seamless reading experience online. Our platform is designed to cater to book enthusiasts, providing a diverse collection of titles across various genres, authors, and languages.
+
+---
 
 ### Screenshots
 For a visual overview of our platform's interface and features, please refer to the [Screenshots](./screenshots.md) section. Screenshots showcase different aspects of our online book reading platform, including the user interface, book browsing, and interactive features.
 
 You can view the presentation of BookLand
 [View Presentation Videos](https://drive.google.com/drive/folders/1Wje7X72HKo4F0SV681AvAFXqDRcHlkib)
+
+
+---
 
 ### System Architecture Overview
 
@@ -35,11 +40,15 @@ Our online book reading platform employs a distributed monolithic architecture, 
 - **Front-End Framework:** For the front-end, we've utilized Next.js to build a responsive and interactive user interface.  
 GitHub Link: [Next.js Front-End](https://github.com/bookland-project/book-shop)
 
+---
+
 ### Database Schema
 
 BookLand utilizes a PostgreSQL database to store its data. The database schema includes tables for users, books, publishers, authentication, and other related information. Here's a brief overview of the main tables:
 
 ![image info](./screens/DataModels.jpg)
+
+---
 
 ### State Diagram
 
@@ -47,11 +56,17 @@ The state diagram illustrates the various states and transitions involved in the
 
 ![image info](./screens/StateDiagram.jpg)
 
+---
+
 ### API Documentation
 For detailed documentation on our API endpoints and how to interact with them, please refer to the [API Documentation](./API-Docs.md) section.
 
+---
+
 ### Admin Panel
 For detailed instructions on using the Admin Panel to manage various aspects of the application such as users, books, discounts, and more, please refer to the [Admin Panel Documentation](./Admin-Panel.md) section.
+
+---
 
 ### Usage & Deployment
 
