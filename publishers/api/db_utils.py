@@ -2,6 +2,7 @@ import hashlib
 import os
 from django.db import connection
 from users.api.file_handler import process_and_upload_book, process_and_upload_book_cover_image
+from users.api.file_handler import process_and_upload_publications_image
 
 def hash_password(password, salt):
     return hashlib.sha256((password + salt).encode()).hexdigest()
@@ -162,10 +163,9 @@ class AccountManagementDBUtils:
                     SUM(b.price) as income
                 FROM userbooks ub
                 JOIN books b ON ub.bookid = b.id
-                WHERE b.isdelete = FALSE
                 GROUP BY bookid
             ) ub ON b.id = ub.bookid
-            WHERE u.id = %s;
+            WHERE u.id = %s AND b.isdelete = FALSE;
         """
 
         return info_list_dict(query, user_id)
@@ -215,14 +215,14 @@ class AccountManagementDBUtils:
             params.append(phone_number2)
 
         if publications_image:
+            response_publications_image = process_and_upload_publications_image(publications_image)
             set_clause.append("PublicationsImage = %s")
-            params.append(publications_image)
+            params.append(response_publications_image)
 
         if card_number:
             set_clause.append("CardNumber = %s")
             params.append(card_number)
 
-        # Check if there's anything to update
         if set_clause:
             # Combine the SET clauses into a single string
             set_clause_str = ", ".join(set_clause)
