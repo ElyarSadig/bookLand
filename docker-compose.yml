@@ -1,21 +1,6 @@
 version: "3"
 
 services:
-  user_service:
-    build:
-      context: .
-      dockerfile: ./bookLand_microservice.dockerfile
-    environment:
-      - DB_HOST=postgres-db
-      - FILE_SERVER=http://file-server:8080
-    networks:
-      - my_network
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./:/app
-    command: gunicorn --bind 0.0.0.0:8000 bookLand_microservice.wsgi:application
-
   postgres-db:
     image: postgres:latest
     environment:
@@ -29,6 +14,26 @@ services:
     volumes:
       - ./SqlScripts.sql:/docker-entrypoint-initdb.d/SqlScripts.sql
       - ./db-data/postgres/:/var/lib/postgresql/data/
+
+
+  user_service:
+    build:
+      context: .
+      dockerfile: ./bookLand_microservice.dockerfile
+    environment:
+      - DB_HOST=postgres-db
+      - FILE_SERVER=http://file-server:8080
+    networks:
+      - my_network
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
+    restart: on-failure
+    depends_on:
+      - postgres-db
+    command: >
+      sh -c "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 bookLand_microservice.wsgi:application"
 
 networks: # Note that network must be created before running compose with this network
   my_network:
