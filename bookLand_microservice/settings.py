@@ -99,8 +99,8 @@ WSGI_APPLICATION = 'bookLand_microservice.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'BookLandDB',
-        'USER': 'admin',
+        'NAME': 'book_land_db',
+        'USER': 'root',
         'PASSWORD': 'password',
         'HOST': config('DB_HOST', default='localhost'),
         'PORT': '5432',

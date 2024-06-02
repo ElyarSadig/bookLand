@@ -2,13 +2,19 @@ version: "3"
 
 services:
   postgres-db:
+    restart: always
     image: postgres:latest
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: BookLandDB
+      - POSTGRES_DB=book_land_db
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=password
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -U root -d book_land_db"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
     networks:
       - my_network
     volumes:
@@ -17,9 +23,10 @@ services:
 
 
   user_service:
+    restart: on-failure
     build:
       context: .
-      dockerfile: ./bookLand_microservice.dockerfile
+      dockerfile: .
     environment:
       - DB_HOST=postgres-db
       - FILE_SERVER=http://file-server:8080
@@ -29,11 +36,11 @@ services:
       - "8000:8000"
     volumes:
       - ./:/app
-    restart: on-failure
-    depends_on:
-      - postgres-db
     command: >
       sh -c "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 bookLand_microservice.wsgi:application"
+    depends_on:
+      postgres-db:
+        condition: service_healthy
 
 networks: # Note that network must be created before running compose with this network
   my_network:
