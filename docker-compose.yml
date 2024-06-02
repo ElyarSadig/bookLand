@@ -5,9 +5,10 @@ services:
     restart: always
     image: postgres:latest
     environment:
-      - POSTGRES_DB=book_land_db
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=password
+      TZ: "Asia/Tehran"
+      POSTGRES_DB: book_land_db
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
     healthcheck:
