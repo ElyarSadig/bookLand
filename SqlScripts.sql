@@ -2,7 +2,7 @@
 -- User table
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    user_name varchar(255) UNIQUE,
+    username VARCHAR(255) UNIQUE,
     email VARCHAR(255) UNIQUE,
     password VARCHAR(255) NOT NULL,
     is_active BOOLEAN NOT NULL,
