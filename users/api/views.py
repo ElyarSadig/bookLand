@@ -8,10 +8,13 @@ from .api_result import APIResult
 from .jwt_token import generate_jwt_token
 from users.api.email_utils import send_email_background_task
 from .jwt_token import publisher_login_required
-from users.models import UserActivityCode, User, UserRole
-from datetime import datetime
+from users.models import UserActivityCode, User, UserRole, Role
 from drf_spectacular.utils import extend_schema
 from django.shortcuts import get_object_or_404
+from django.db import transaction
+from .utils import generate_random_code
+from django.utils import timezone
+from django.contrib.auth import authenticate
 
 
 def error_response(api_result, error_message, status_code):
@@ -38,17 +41,16 @@ class PublisherSignUpView(GenericAPIView):
             if User.objects.filter(email=email).exists():
                 return error_response(response.api_result, error_message="ایمیل قبلا ثبت شده است.", status_code=status.HTTP_400_BAD_REQUEST)
 
-            user = User.objects.create(username=username, email=email, is_publisher=True, is_confirm=False)
+            with transaction.atomic():
+                user = User.objects.create(username=username, email=email, is_publisher=True, is_confirm=False)
+                user.set_password(password)
+                user.save()
+                role, created = Role.objects.get_or_create(role='Publisher', defaults={'description': 'Publisher Role'})
+                UserRole.objects.create(user=user, role=role)
+                token = generate_jwt_token(user.id, role.id)
+                response.api_result['data'] = token
 
-            user.set_password(password)
-
-            role_id = UserRole.assign_publisher_role(user.id)
-
-            token = generate_jwt_token(user.id, role_id)
-
-            response.api_result['data'] = token
-
-            return Response(response.api_result, status=status.HTTP_200_OK)
+                return Response(response.api_result, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -96,7 +98,6 @@ class PublisherImageUploadView(GenericAPIView):
         response = APIResult()
         serializer = PublisherImageUploadSerializer(data=request.data)
         if serializer.is_valid():
-
             publications_image = serializer.validated_data['publications_image']
             identity_image = serializer.validated_data['identity_image']
 
@@ -126,16 +127,16 @@ class UserSignUpView(GenericAPIView):
             if User.objects.filter(email=email).exists():
                 return error_response(response.api_result, error_message="ایمیل قبلا ثبت شده است", status_code=status.HTTP_400_BAD_REQUEST)
 
-            user = User.objects.create(email=email, username=username, is_publisher=False, is_confirm=False)
-            user.set_password(password)
+            with transaction.atomic():
+                user = User.objects.create(email=email, username=username, is_publisher=False, is_confirm=False)
+                user.set_password(password)
+                user.save()
+                role, created = Role.objects.get_or_create(role='Customer', defaults={'description': 'Customer Role'})
+                UserRole.objects.create(user=user, role=role)
+                token = generate_jwt_token(user.id, role.id)
+                response.api_result['data'] = token
 
-            role_id = UserRole.assign_customer_role(user.id)
-
-            token = generate_jwt_token(user.id, role_id)
-
-            response.api_result['data'] = token
-
-            return Response(response.api_result, status=status.HTTP_200_OK)
+                return Response(response.api_result, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -152,19 +153,16 @@ class UserLoginView(GenericAPIView):
             identifier = serializer.validated_data['email_or_username']
             password = serializer.validated_data['password']
 
-            user = User.objects.filter(username=identifier) | User.objects.filter(email=identifier)
+            user = authenticate(username=identifier, password=password)
 
-            if not user.exists():
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+            if user is None:
+                return error_response(response.api_result, error_message="اطلاعات وارد شده صحیح نمی باشد", status_code=status.HTTP_400_BAD_REQUEST)
 
-            user = user.first()
+            if not user.is_active:
+                return error_response(response.api_result, error_message="کاربر مسدود شده است", status_code=status.HTTP_400_BAD_REQUEST)
 
-            if not user.password_valid(password):
-                return error_response(response.api_result, error_message="کاربر با این اطلاعات وجود ندارد.", status_code=status.HTTP_400_BAD_REQUEST)
-
-            role_id = UserRole.get_user_role_id(user.id)
-
-            token = generate_jwt_token(user.id, role_id)
+            role = UserRole.objects.get(user=user)
+            token = generate_jwt_token(user.id, role.id)
 
             response.api_result['data'] = token
 
@@ -187,11 +185,12 @@ class SendSignUpEmailView(GenericAPIView):
             if User.objects.filter(email=email).exists():
                 return error_response(response.api_result, error_message="ایمیل قبلا ثبت شده است.", status_code=status.HTTP_400_BAD_REQUEST)
 
-            user_activity = UserActivityCode.create_user_activity_code(email)
+            activation_code = generate_random_code()
+            user_activity = UserActivityCode.objects.create(email=email, activation_code=activation_code)
 
             subject = "فعال سازی حساب کاربری"
             template = "users/email_signup.html"
-            send_email_background_task(subject, template, user_activity.activity_code, email)
+            send_email_background_task(subject, template, user_activity.activation_code, email)
 
             return Response(response.api_result, status=status.HTTP_200_OK)
 
@@ -210,8 +209,17 @@ class VerifyEmailCodeView(GenericAPIView):
             email = serializer.validated_data['email']
             activation_code = serializer.validated_data['activation_code']
 
-            if not UserActivityCode.valid_user_activity_code(email, activation_code):
-                return error_response(response.api_result, error_message="کد وارد شده نا معتبر است.", status_code=status.HTTP_400_BAD_REQUEST)
+            user_activity_code = UserActivityCode.objects.filter(email=email, activation_code=activation_code).first()
+            if not user_activity_code:
+                return error_response(response.api_result, error_message="کد وارد شده نا معتبر است.",
+                                      status_code=status.HTTP_400_BAD_REQUEST)
+
+            current_datetime = timezone.now()
+            expire_date = activation_code.created_date + activation_code.validity_duration
+            if current_datetime > expire_date:
+                return error_response(response.api_result,
+                                      error_message="به علت تاخیر زیاد دسترسی وجود ندارد. دوباره امتحان کنید",
+                                      status_code=status.HTTP_400_BAD_REQUEST)
 
             return Response(response.api_result, status=status.HTTP_200_OK)
 
@@ -230,13 +238,14 @@ class SendPasswordResetCodeView(GenericAPIView):
             email = serializer.validated_data["email"]
 
             if not User.objects.filter(email=email).exists():
-                return error_response(response.api_result, error_message="ایمیل وجود ندارد.", status_code=status.HTTP_400_BAD_REQUEST)
+                return error_response(response.api_result, error_message="ایمیل ثبت نشده است", status_code=status.HTTP_400_BAD_REQUEST)
 
-            user_activity = UserActivityCode.create_user_activity_code(email)
+            activation_code = generate_random_code()
+            user_activity = UserActivityCode.objects.create(email=email, activation_code=activation_code)
 
             subject = "بازیابی رمز عبور"
             template = "users/reset_password_email.html"
-            send_email_background_task(subject, template, user_activity.activity_code, email)
+            send_email_background_task(subject, template, user_activity.activation_code, email)
 
             return Response(response.api_result, status=status.HTTP_200_OK)
 
@@ -256,21 +265,25 @@ class PasswordResetView(GenericAPIView):
             activation_code = serializer.validated_data['activation_code']
             password = serializer.validated_data['password']
 
-            latest_code = UserActivityCode.objects.filter(email=email).latest('created_date_time')
+            latest_code = UserActivityCode.objects.filter(email=email).latest('created_date')
 
             if latest_code is None:
                 return error_response(response.api_result, error_message="کد وارد شده نامعتبر است.", status_code=status.HTTP_400_BAD_REQUEST)
 
-            current_datetime = datetime.now()
+            if latest_code.activation_code != activation_code:
+                return error_response(response.api_result, error_message="کد وارد شده نامعتبر است.",
+                                      status_code=status.HTTP_400_BAD_REQUEST)
 
-            if current_datetime > latest_code.expire_date_time:
-                return error_response(response.api_result, error_message="به علت تاخیر زیاد دسترسی وجود ندارد. دوباره امتحان کنید", status_code=status.HTTP_400_BAD_REQUEST)
-
-            if latest_code.activity_code != activation_code:
-                return error_response(response.api_result, error_message="کد وارد شده نامعتبر است.", status_code=status.HTTP_400_BAD_REQUEST)
+            current_datetime = timezone.now()
+            expire_date = latest_code.created_date + latest_code.validity_duration
+            if current_datetime > expire_date:
+                return error_response(response.api_result,
+                                      error_message="به علت تاخیر زیاد دسترسی وجود ندارد. دوباره امتحان کنید",
+                                      status_code=status.HTTP_400_BAD_REQUEST)
 
             user = User.objects.get(email=email)
             user.set_password(password)
+            user.save()
 
             return Response(response.api_result, status=status.HTTP_200_OK)
 
