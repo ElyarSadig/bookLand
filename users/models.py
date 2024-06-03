@@ -44,7 +44,6 @@ class User(AbstractUser):
 
 
 class UserActivityCode(models.Model):
-    id = models.AutoField(primary_key=True)
     email = models.EmailField(max_length=255)
     activation_code = models.CharField(max_length=6)
     created_date = models.DateTimeField(auto_now_add=True)
@@ -58,7 +57,6 @@ class UserActivityCode(models.Model):
 
 
 class Role(models.Model):
-    id = models.AutoField(primary_key=True)
     role = models.CharField(max_length=50, unique=True)
     description = models.CharField(max_length=150, null=True, blank=True)
 
@@ -70,7 +68,6 @@ class Role(models.Model):
 
 
 class UserRole(models.Model):
-    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.ForeignKey(Role, on_delete=models.CASCADE)
 
