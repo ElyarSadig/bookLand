@@ -4,133 +4,118 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Category(models.Model):
-    id = models.AutoField(primary_key=True, db_column='id')
-    name = models.CharField(max_length=255, unique=True, db_column='name')
+    name = models.CharField(max_length=255, unique=True, null=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'categories'
 
 
 class Language(models.Model):
-    id = models.AutoField(primary_key=True, db_column='id')
-    name = models.CharField(max_length=50, unique=True, db_column='name')
+    name = models.CharField(max_length=50, unique=True, null=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'languages'
 
 
 class Review(models.Model):
-    id = models.AutoField(primary_key=True, db_column='id')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, db_column='userid')
-    book = models.ForeignKey('Book', on_delete=models.CASCADE, db_column='bookid', related_name='book')
-    rating = models.IntegerField(db_column='rating', validators=[
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
+    book = models.ForeignKey('Book', on_delete=models.CASCADE, related_name='reviews')
+    rating = models.IntegerField(validators=[
             MinValueValidator(limit_value=1),
             MaxValueValidator(limit_value=5),
         ])
-    created_at = models.DateTimeField(auto_now_add=True, db_column='createdat')
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.user.username + " reviewed " + self.book.name
 
     class Meta:
-        managed = False
         db_table = 'reviews'
 
 
 class Book(models.Model):
-    id = models.AutoField(primary_key=True, db_column='id')
-    publisher = models.ForeignKey(User, on_delete=models.CASCADE, db_column='userid')
-    name = models.CharField(max_length=255, db_column='bookname')
-    author_name = models.CharField(max_length=255, db_column='authorname')
-    translator_name = models.CharField(max_length=255, db_column='translatorname', blank=True, null=True)
-    released_date = models.IntegerField(db_column='releaseddate')
-    book_cover_image = models.CharField(db_column='bookcoverimage')
-    price = models.FloatField(db_column='price')
-    description = models.TextField(db_column='description')
-    number_of_pages = models.IntegerField(db_column='numberofpages')
-    language = models.ForeignKey(Language, on_delete=models.CASCADE, db_column='languageid')
-    is_delete = models.BooleanField(default=False, db_column='isdelete')
-    created_date = models.DateTimeField(db_column='createddatetime', auto_now_add=True)
+    publisher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='published_books')
+    name = models.CharField(max_length=255)
+    author_name = models.CharField(max_length=255)
+    translator_name = models.CharField(max_length=255, blank=True, null=True)
+    released_date = models.IntegerField()
+    book_cover_image = models.CharField(max_length=255)
+    price = models.IntegerField()
+    description = models.TextField(null=True)
+    number_of_pages = models.IntegerField()
+    language = models.ForeignKey(Language, on_delete=models.CASCADE)
+    is_delete = models.BooleanField(default=False)
+    created_date = models.DateTimeField(auto_now_add=True)
+    categories = models.ManyToManyField('Category', through='BookCategory', related_name='books')
+    users = models.ManyToManyField(User, through='UserBook', related_name='bought_books')
+    bookmarks = models.ManyToManyField(User, through='UserBookmark', related_name='bookmarked_books')
 
     def __str__(self):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'books'
 
 
 class BookCategory(models.Model):
-    id = models.AutoField(primary_key=True, db_column='id')
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, db_column='categoryid')
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, db_column='bookid')
-    is_delete = models.BooleanField(default=False, db_column='isdelete')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='book_categories')
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='book_categories')
+    is_delete = models.BooleanField(default=False)
 
     def __str__(self):
         return self.category.name
 
     class Meta:
-        managed = False
-        db_table = 'bookcategories'
+        db_table = 'book_categories'
 
 
 class BookFile(models.Model):
-    id = models.AutoField(primary_key=True, db_column='id')
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, db_column='bookid')
-    demo_file = models.TextField(db_column='bookdemofile')
-    original_file = models.TextField(db_column='bookoriginalfile')
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='files')
+    demo_file = models.CharField(max_length=200)
+    original_file = models.CharField(max_length=200)
 
     def __str__(self):
         return self.book.name
 
     class Meta:
-        managed = False
-        db_table = "bookfiles"
+        db_table = "book_files"
 
 
 class Comment(models.Model):
-    id = models.AutoField(primary_key=True, db_column='id')
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, db_column='bookid')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, db_column='userid')
-    description = models.TextField(db_column='comment')
-    is_delete = models.BooleanField(default=False, db_column='isdelete')
-    created_date = models.DateTimeField(auto_now_add=True, db_column='createddate')
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+    comment = models.TextField()
+    is_delete = models.BooleanField()
+    created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.user.username + " commented " + self.book.name
 
     class Meta:
-        managed = False
         db_table = 'comments'
 
 
 class UserBook(models.Model):
-    id = models.AutoField(primary_key=True, db_column="id")
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, db_column="bookid")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, db_column="userid")
-    bought_time = models.DateTimeField(auto_created=True, db_column="boughttime")
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='user_books')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_books')
+    bought_time = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        managed = False
-        db_table = 'userbooks'
+        db_table = 'user_books'
 
 
 class UserBookmark(models.Model):
-    id = models.AutoField(primary_key=True, db_column="id")
-    book = models.ForeignKey('Book', on_delete=models.CASCADE, db_column="bookid")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, db_column="userid")
-    added_time = models.DateTimeField(auto_now=True, db_column="addedtime")
-    is_delete = models.BooleanField(default=False, db_column="isdelete")
+    book = models.ForeignKey('Book', on_delete=models.CASCADE, related_name='book_bookmarks')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_bookmarks')
+    added_time = models.DateTimeField(auto_now_add=True)
+    is_delete = models.BooleanField(default=False)
 
     class Meta:
-        managed = False
-        db_table = 'userbookmarks'
+        db_table = 'user_bookmarks'
         unique_together = ('user', 'book')
