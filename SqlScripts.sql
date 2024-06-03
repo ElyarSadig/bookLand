@@ -62,6 +62,8 @@ CREATE TABLE IF NOT EXISTS books (
     number_of_pages INTEGER,
     language_id INTEGER REFERENCES languages(id),
     is_delete BOOLEAN NOT NULL,
+    demo_file VARCHAR(255) NOT NULL,
+    original_file VARCHAR(255) NOT NULL,
     created_date_time TIMESTAMP
 );
 
@@ -72,14 +74,6 @@ CREATE TABLE IF NOT EXISTS reviews (
     book_id INTEGER REFERENCES books(id),
     rating INTEGER CHECK (rating BETWEEN 1 AND 5),
     created_at TIMESTAMP
-);
-
--- BookFiles table
-CREATE TABLE IF NOT EXISTS book_files (
-    id SERIAL PRIMARY KEY,
-    book_id INTEGER REFERENCES books(id),
-    book_demo_file VARCHAR(255),
-    book_original_file VARCHAR(255)
 );
 
 -- UserBooks table

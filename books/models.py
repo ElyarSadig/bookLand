@@ -52,6 +52,8 @@ class Book(models.Model):
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
     is_delete = models.BooleanField(default=False)
     created_date = models.DateTimeField(auto_now_add=True)
+    demo_file = models.CharField(max_length=255)
+    original_file = models.CharField(max_length=255)
     categories = models.ManyToManyField('Category', through='BookCategory', related_name='books')
     users = models.ManyToManyField(User, through='UserBook', related_name='bought_books')
     bookmarks = models.ManyToManyField(User, through='UserBookmark', related_name='bookmarked_books')
@@ -75,18 +77,6 @@ class BookCategory(models.Model):
         db_table = 'book_categories'
 
 
-class BookFile(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='files')
-    demo_file = models.CharField(max_length=200)
-    original_file = models.CharField(max_length=200)
-
-    def __str__(self):
-        return self.book.name
-
-    class Meta:
-        db_table = "book_files"
-
-
 class Comment(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='comments')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
@@ -108,6 +98,10 @@ class UserBook(models.Model):
 
     class Meta:
         db_table = 'user_books'
+
+    @classmethod
+    def has_user_bought_book(cls, user_id, book_id):
+        return cls.objects.filter(user_id=user_id, book_id=book_id).exists()
 
 
 class UserBookmark(models.Model):
