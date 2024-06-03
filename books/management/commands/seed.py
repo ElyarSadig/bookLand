@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from books.models import Language, Category, Book, Review, BookFile, UserBook, UserBookmark, Comment, BookCategory
+from books.models import Language, Category, Book, Review, UserBook, UserBookmark, Comment, BookCategory
 from users.models import Role, User, UserRole
 from accounts.models import WalletAction, WalletActionType, Discount, UserDiscount
 from django.contrib.auth.hashers import make_password
@@ -129,6 +129,8 @@ class Command(BaseCommand):
                 price=115000,
                 number_of_pages=350,
                 language_id=1,
+                demo_file='http://localhost:8080/books/demo-1.pdf',
+                original_file='http://localhost:8080/books/original-1.pdf',
                 description='کتاب پرسش‌های چهار گزینه‌ای فیزیک جامع - رشته ریاضی، شامل تمام نکات و ایده‌های رایج تستی کنکور، درس‌نامه‌های جامع و کنکوری، بیش از 2600 تست سراسری و تألیفی به سبک کنکور جدید و پاسخ‌های تشریحی با روش‌ها و تکنیک‌های کاربردی است.'
             ),
             Book(
@@ -141,6 +143,8 @@ class Command(BaseCommand):
                 price=74000,
                 number_of_pages=400,
                 language_id=1,
+                demo_file='http://localhost:8080/books/demo-2.pdf',
+                original_file='http://localhost:8080/books/original-2.pdf',
                 description='کتاب پرسش‌های چهار گزینه‌ای شیمی 2 - پایه یازدهم نوشته‌ی نیما سپهری و مهدی براتی، دربردارنده‌ی درس‌نامه، تست‌های کنکوری و تألیفی و پاسخ‌های تشریحی و کلیدی است که به دانش‌آموزان کمک می‌کند این درس را بهتر یاد بگیرند و سؤالات و تمرینات درسی‌شان را راحت‌تر حل کنند. این کتاب ویژه‌ی دانش‌آموزان رشته‌های ریاضی و تجربی است.'
             ),
             Book(
@@ -153,6 +157,8 @@ class Command(BaseCommand):
                 price=143000,
                 number_of_pages=554,
                 language_id=1,
+                demo_file='http://localhost:8080/books/demo-3.pdf',
+                original_file='http://localhost:8080/books/original-3.pdf',
                 description='کتاب پرسش‌های چهار گزینه‌ای ریاضیات تجربی جامع - پاسخ - دهم، یازدهم، دوازدهم: جلد دوم، حاصل همکاری سروش موئینی، رسول محسنی منش و کوروش اسلامی است و پاسخنامه‌ی آزمون‌های جلد اول همین کتاب را در برمی‌گیرد. این پاسخنامه به صورت تشریحی و با راه‌حل‌های متنوع، مفصل و تکنیکی ارائه شده است.'
             ),
             Book(
@@ -165,6 +171,8 @@ class Command(BaseCommand):
                 price=52000,
                 number_of_pages=300,
                 language_id=1,
+                demo_file='http://localhost:8080/books/demo-4.pdf',
+                original_file='http://localhost:8080/books/original-4.pdf',
                 description='کتاب پرسش‌های چهار گزینه‌ای فارسی 1 - پایه دهم، مجموعه‌ای از درس‌نامه و سؤالات تستی، کادر آموزشی آرایه‌های ادبی، کادر آموزشی دستور زبان فارسی و پاسخ‌نامه‌ی تشریحی است.'
             ),
             Book(
@@ -177,6 +185,8 @@ class Command(BaseCommand):
                 price=120000,
                 number_of_pages=500,
                 language_id=1,
+                demo_file='http://localhost:8080/books/demo-5.pdf',
+                original_file='http://localhost:8080/books/original-5.pdf',
                 description='کتاب پرسش‌های چهار گزینه‌ای فارسی جامع - سوال - دهم، یازدهم و دوازدهم - جلد اول یک مجموعه‌ سوال کنکوری به‌همراه پاسخنامه‌ی کلیدی است که به تسلط شما بر مباحث درسی و قرار گرفتن در حال‌و‌هوای آزمون سراسری کمک می‌کند.'
             ),
             Book(
@@ -188,6 +198,8 @@ class Command(BaseCommand):
                 book_cover_image='http://localhost:8080/book-covers/demo-6.jpg',
                 price=30000,
                 number_of_pages=663,
+                demo_file='http://localhost:8080/books/demo-6.pdf',
+                original_file='http://localhost:8080/books/original-6.pdf',
                 language_id=1,
                 description='کتاب نبرد من تنها کتابی است که انتشار آن در آلمان ممنوع است. آدولف هیتلر در این کتاب دیدگاه‌های خود را بیان کرده، اثری که مبنای برپایی حزب ناسیونالیسم (نازی) شد و جهان را درگیر مصیبتی همه‌گیر کرد.'
             ),
@@ -200,6 +212,8 @@ class Command(BaseCommand):
                 book_cover_image='http://localhost:8080/book-covers/demo-7.jpg',
                 price=70000,
                 number_of_pages=446,
+                demo_file='http://localhost:8080/books/demo-7.pdf',
+                original_file='http://localhost:8080/books/original-7.pdf',
                 language_id=1,
                 description='روخوس میش یکی از محافظین شخصی آدولف هیتلر، رهبر جنجالی حزب نازی، بود. او در کتاب با پیشوا تا ابد: خاطرات محافظ شخصی هیتلر، به روایت دوران کارش در سازمان نظامی اس اس پرداخته و از این طریق، برای نخستین بار ناگفته‌های بسیاری را در باب تشکیلات نازی‌ها بیان نموده است.'
             ),
@@ -213,6 +227,8 @@ class Command(BaseCommand):
                 price=43000,
                 number_of_pages=332,
                 language_id=1,
+                demo_file='http://localhost:8080/books/demo-8.pdf',
+                original_file='http://localhost:8080/books/original-8.pdf',
                 description='کتاب A persian in London (یک ایرانی در لندن) به قلم محمد افشاروالا، اصطلاحات و واژگان مهم و کاربردی زبان انگلیسی را مورد بررسی قرار می‌دهد. تمرکز این کتاب بر روی فراگیری اصطلاحات بریتانیایی است.'
             ),
             Book(
@@ -224,6 +240,8 @@ class Command(BaseCommand):
                 book_cover_image='http://localhost:8080/book-covers/demo-9.jpg',
                 price=60000,
                 number_of_pages=155,
+                demo_file='http://localhost:8080/books/demo-9.pdf',
+                original_file='http://localhost:8080/books/original-9.pdf',
                 language_id=2,
                 description='نویسنده‌ی کتاب پرفروش دنیای سوفی با یک کتاب پرخواستار دیگر بازگشته است. یوستین گردر در کتاب دختر پرتقالی داستان پسری پانزده‌ساله به نام «جرج» را روایت می‌کند که در کودکی پدر خود را از دست داده است. ماجرا از زمانی آغاز می‌شود که مجموعه‌ نامه‌هایی از پدر به دست جرج می‌رسند. گویی که این دست‌نوشته‌ها راهی تازه برای ارتباط برقرار کردن او با پدرش باشند... لازم به ذکر است بیش از چهل میلیون نسخه از کتاب حاضر در سرتاسر جهان به فروش رسیده است.'
             ),
@@ -236,6 +254,8 @@ class Command(BaseCommand):
                 book_cover_image='http://localhost:8080/book-covers/demo-10.jpg',
                 price=140000,
                 number_of_pages=512,
+                demo_file='http://localhost:8080/books/demo-10.pdf',
+                original_file='http://localhost:8080/books/original-10.pdf',
                 language_id=2,
                 description='کتاب The Egyptian نوشته Mika Waltari در سال های بسیار دور نوشته شده است که بسیاری از وقایع و اتفاقاتی که روایت می گردد بر اساس داستانی واقعی می باشد. بیشتر اتفاقات کتاب به سال های فرمانروایی فراعنه در مصر می پردازد…'
             ),
@@ -249,6 +269,8 @@ class Command(BaseCommand):
                 price=25000,
                 number_of_pages=312,
                 language_id=1,
+                demo_file='http://localhost:8080/books/demo-11.pdf',
+                original_file='http://localhost:8080/books/original-11.pdf',
                 description='عشق و خودشناسی در تقابل با یکدیگر! رافائل ژیوردانو خالق کتاب محبوب «زندگی دومت زمانی آغاز می‌شود که می‌فهمی فقط یک زندگی داری» این‌بار به سراغ موضوع تازه‌ای رفته است. داستان کتاب فرشته عشق بال‌های مقوایی دارد روایتی ماجراجویانه و هیجان‌انگیز درباره عشق و تلاش برای یافتن آن در زندگی و در میان روابط انسانی است.'
             ),
             Book(
@@ -261,6 +283,8 @@ class Command(BaseCommand):
                 price=19900,
                 number_of_pages=274,
                 language_id=1,
+                demo_file='http://localhost:8080/books/demo-12.pdf',
+                original_file='http://localhost:8080/books/original-12.pdf',
                 description='کتاب در حسرت فرشته به قلم زهره زندیه، داستانی اجتماعی و جذاب و متعهد به ارزش‌‌‌های انسانی به شمار می‌رود که شما را با خود و احساسات بی‌آلایشتان آشتی می‌دهد. این کتاب روایتگر دردها و مشکلات بسیاری از افراد جامعه است که لحظات غیر قابل وصفی را برای شما رقم می‌زند.'
             ),
             Book(
@@ -273,6 +297,8 @@ class Command(BaseCommand):
                 price=15900,
                 number_of_pages=256,
                 language_id=1,
+                demo_file='http://localhost:8080/books/demo-13.pdf',
+                original_file='http://localhost:8080/books/original-13.pdf',
                 description='کتاب مناظره با شیطان نوشته‌ی اصغر بهمنی، دستمایه‌ای است برای شناخت «ابلیس» و یا «رئیس شیاطین عالم» که در این اثر از آن به عنوان «شیطان» یاد می‌شود. در این کتاب، «انسان» عبارت است از یک آدمیزاد پاکدل و دشمن شناس.'
             ),
             Book(
@@ -285,6 +311,8 @@ class Command(BaseCommand):
                 price=18000,
                 number_of_pages=112,
                 language_id=1,
+                demo_file='http://localhost:8080/books/demo-14.pdf',
+                original_file='http://localhost:8080/books/original-14.pdf',
                 description='در کتاب شیطان پرستی مدرن، به تالیف حسین بابازاده مقدم، به یکی از جریان‌های فاسد فکری و فرهنگی که ابتدا مرزهای اخلاقیات را در کشورهای اروپایی و آمریکایی در هم شکسته و سپس به سرزمین‌های شرقی رسیده، پرداخته شده است.'
             ),
             Book(
@@ -297,6 +325,8 @@ class Command(BaseCommand):
                 price=21000,
                 number_of_pages=272,
                 language_id=1,
+                demo_file='http://localhost:8080/books/demo-15.pdf',
+                original_file='http://localhost:8080/books/original-15.pdf',
                 description='کتاب جهان، صفحه شطرنج سازمان‌های سری نوشته‌ی منصور عبدالحکیم، مورّخ، پژوهشگر و نویسنده صاحب نام مصری است. او در این اثر به بررسی نحوۀ پیدایش مجامع مخفی و انجمن فراماسونری، نحوۀ عملکرد و معرفی فرقه‌ها و گروه‌های نشئت گرفته از این انجمن و عملکرد این گروه‌ها و تأثیرشان در جهان پرداخته است.'
             ),
             Book(
@@ -309,6 +339,8 @@ class Command(BaseCommand):
                 price=19900,
                 number_of_pages=274,
                 language_id=1,
+                demo_file='http://localhost:8080/books/demo-16.pdf',
+                original_file='http://localhost:8080/books/original-16.pdf',
                 description='کتاب در حسرت فرشته به قلم زهره زندیه، داستانی اجتماعی و جذاب و متعهد به ارزش‌‌‌های انسانی به شمار می‌رود که شما را با خود و احساسات بی‌آلایشتان آشتی می‌دهد. این کتاب روایتگر دردها و مشکلات بسیاری از افراد جامعه است که لحظات غیر قابل وصفی را برای شما رقم می‌زند.'
             ),
         ])
@@ -321,42 +353,6 @@ class Command(BaseCommand):
             Review(user_id=2, book_id=7, rating=3, created_at='2023-01-16 10:00:00'),
             Review(user_id=1, book_id=7, rating=4, created_at='2023-01-17 11:00:00'),
             Review(user_id=1, book_id=5, rating=3, created_at='2023-01-18 12:00:00'),
-        ])
-
-        # Insert data into BookFile
-        BookFile.objects.bulk_create([
-            BookFile(book_id=1, demo_file='http://localhost:8080/books/demo-1.pdf',
-                     original_file='http://localhost:8080/books/original-1.pdf'),
-            BookFile(book_id=2, demo_file='http://localhost:8080/books/demo-2.pdf',
-                     original_file='http://localhost:8080/books/original-2.pdf'),
-            BookFile(book_id=3, demo_file='http://localhost:8080/books/demo-3.pdf',
-                     original_file='http://localhost:8080/books/original-3.pdf'),
-            BookFile(book_id=4, demo_file='http://localhost:8080/books/demo-4.pdf',
-                     original_file='http://localhost:8080/books/original-4.pdf'),
-            BookFile(book_id=5, demo_file='http://localhost:8080/books/demo-5.pdf',
-                     original_file='http://localhost:8080/books/original-5.pdf'),
-            BookFile(book_id=6, demo_file='http://localhost:8080/books/demo-6.pdf',
-                     original_file='http://localhost:8080/books/original-6.pdf'),
-            BookFile(book_id=7, demo_file='http://localhost:8080/books/demo-7.pdf',
-                     original_file='http://localhost:8080/books/original-7.pdf'),
-            BookFile(book_id=8, demo_file='http://localhost:8080/books/demo-8.pdf',
-                     original_file='http://localhost:8080/books/original-8.pdf'),
-            BookFile(book_id=9, demo_file='http://localhost:8080/books/demo-9.pdf',
-                     original_file='http://localhost:8080/books/original-9.pdf'),
-            BookFile(book_id=10, demo_file='http://localhost:8080/books/demo-10.pdf',
-                     original_file='http://localhost:8080/books/original-10.pdf'),
-            BookFile(book_id=11, demo_file='http://localhost:8080/books/demo-11.pdf',
-                     original_file='http://localhost:8080/books/original-11.pdf'),
-            BookFile(book_id=12, demo_file='http://localhost:8080/books/demo-12.pdf',
-                     original_file='http://localhost:8080/books/original-12.pdf'),
-            BookFile(book_id=13, demo_file='http://localhost:8080/books/demo-13.pdf',
-                     original_file='http://localhost:8080/books/original-13.pdf'),
-            BookFile(book_id=14, demo_file='http://localhost:8080/books/demo-14.pdf',
-                     original_file='http://localhost:8080/books/original-14.pdf'),
-            BookFile(book_id=15, demo_file='http://localhost:8080/books/demo-15.pdf',
-                     original_file='http://localhost:8080/books/original-15.pdf'),
-            BookFile(book_id=16, demo_file='http://localhost:8080/books/demo-16.pdf',
-                     original_file='http://localhost:8080/books/original-16.pdf'),
         ])
 
         # Insert data into UserBooks
