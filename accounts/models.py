@@ -3,59 +3,51 @@ from users.models import User
 
 
 class WalletActionType(models.Model):
-    id = models.AutoField(primary_key=True, db_column='id')
-    action_type = models.CharField(max_length=255, unique=True, db_column='actiontype')
+    action_type = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
         return self.action_type
 
     class Meta:
-        managed = False
-        db_table = 'walletactiontypes'
+        db_table = 'wallet_action_types'
 
 
 class WalletAction(models.Model):
-    id = models.AutoField(primary_key=True, db_column='id')
-    action_type = models.ForeignKey(WalletActionType, on_delete=models.CASCADE, db_column='actiontypeid')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, db_column='userid')
-    amount = models.FloatField(db_column='amount')
-    is_successful = models.BooleanField(default=False, db_column='issuccessful')
-    description = models.TextField(db_column='description')
-    created_date = models.DateTimeField(auto_now_add=True, db_column='createddate')
+    action_type = models.ForeignKey(WalletActionType, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    amount = models.IntegerField()
+    is_successful = models.BooleanField(default=False)
+    description = models.TextField()
+    created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.user.username + " | " + str(self.amount)
 
     class Meta:
-        managed = False
-        db_table = "walletactions"
+        db_table = "wallet_actions"
 
 
 class Discount(models.Model):
-    id = models.AutoField(primary_key=True, db_column='id')
-    code = models.CharField(max_length=255, unique=True, db_column='code')
-    quantity = models.IntegerField(db_column='quantity')
-    percent = models.FloatField(db_column='percent')
-    created_date = models.DateTimeField(auto_now_add=True, db_column='createddate')
-    expire_date = models.DateTimeField(db_column='expiredate')
-    is_delete = models.BooleanField(db_column='isdelete')
+    code = models.CharField(max_length=255, unique=True)
+    quantity = models.IntegerField()
+    percent = models.DecimalField(max_digits=4, decimal_places=2)
+    created_date = models.DateTimeField(auto_now_add=True)
+    expire_date = models.DateTimeField()
+    is_delete = models.BooleanField(default=False)
 
     def __str__(self):
         return self.code + " | " + str(self.quantity)
 
     class Meta:
-        managed = False
         db_table = 'discounts'
 
 
 class UserDiscount(models.Model):
-    id = models.AutoField(primary_key=True, db_column='id')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, db_column='userid')
-    discount = models.ForeignKey(Discount, on_delete=models.CASCADE, db_column='discountid')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    discount = models.ForeignKey(Discount, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.username + " used " + self.discount.code
 
     class Meta:
-        managed = False
-        db_table = 'userdiscounts'
+        db_table = 'user_discounts'

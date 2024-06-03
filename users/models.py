@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 from users.api.file_handler import process_and_upload_identity_path, process_and_upload_publications_image
 from django.contrib.auth.models import AbstractUser
 from datetime import timedelta
@@ -19,6 +18,9 @@ class User(AbstractUser):
     publications_image = models.CharField(max_length=255, null=True, blank=True)
     is_confirm = models.BooleanField(default=False)
     roles = models.ManyToManyField('Role', through='UserRole')
+    books = models.ManyToManyField('books.Book', through='books.UserBook', related_name='users_books')
+    bookmarks = models.ManyToManyField('books.Book', through='books.UserBookmark', related_name='user_bookmarks')
+    discounts = models.ManyToManyField('accounts.Discount', through='accounts.UserDiscount', related_name='users')
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = []
