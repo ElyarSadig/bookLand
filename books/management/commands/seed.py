@@ -370,15 +370,15 @@ class Command(BaseCommand):
 
         # Insert data into UserBookmarks
         UserBookmark.objects.bulk_create([
-            UserBookmark(book_id=16, user_id=2, added_time='2023-01-16 09:00:00', is_delete=False),
-            UserBookmark(book_id=12, user_id=2, added_time='2023-01-16 09:00:00', is_delete=False),
-            UserBookmark(book_id=13, user_id=2, added_time='2023-01-17 09:00:00', is_delete=False),
-            UserBookmark(book_id=11, user_id=2, added_time='2023-01-18 09:00:00', is_delete=False),
-            UserBookmark(book_id=15, user_id=2, added_time='2023-01-19 09:00:00', is_delete=False),
-            UserBookmark(book_id=2, user_id=1, added_time='2023-01-19 09:00:00', is_delete=False),
-            UserBookmark(book_id=1, user_id=1, added_time='2023-01-19 09:00:00', is_delete=False),
-            UserBookmark(book_id=4, user_id=1, added_time='2023-01-19 09:00:00', is_delete=False),
-            UserBookmark(book_id=5, user_id=1, added_time='2023-01-20 09:00:00', is_delete=False),
+            UserBookmark(book_id=16, user_id=2, added_time='2023-01-16 09:00:00'),
+            UserBookmark(book_id=12, user_id=2, added_time='2023-01-16 09:00:00'),
+            UserBookmark(book_id=13, user_id=2, added_time='2023-01-17 09:00:00'),
+            UserBookmark(book_id=11, user_id=2, added_time='2023-01-18 09:00:00'),
+            UserBookmark(book_id=15, user_id=2, added_time='2023-01-19 09:00:00'),
+            UserBookmark(book_id=2, user_id=1, added_time='2023-01-19 09:00:00'),
+            UserBookmark(book_id=1, user_id=1, added_time='2023-01-19 09:00:00'),
+            UserBookmark(book_id=4, user_id=1, added_time='2023-01-19 09:00:00'),
+            UserBookmark(book_id=5, user_id=1, added_time='2023-01-20 09:00:00'),
         ])
 
         # Insert data into Comments
