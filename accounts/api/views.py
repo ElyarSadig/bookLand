@@ -3,10 +3,14 @@ from rest_framework.response import Response
 from rest_framework import status
 from .jwt_auth import login_required
 from users.api.api_result import APIResult
-from .serializers import PasswordChangeSerializer, UserBookmarkSerializer
-from .exceptions import *
+from .serializers import PasswordChangeSerializer, UserProfileSerializer
 from rest_framework.pagination import PageNumberPagination
-from .db_utils import AccountManagementDBUtils, hash_password
+from users.models import User
+from accounts.api.serializers import UserBookSerializer, UserBookmarkSerializer
+from books.models import Book, UserBookmark
+from django.db.models import Q, F, Sum, Case, When, Value, IntegerField
+from accounts.models import WalletAction
+from .pagination import WalletActionPagination
 
 
 class ChangePasswordView(GenericAPIView):
@@ -21,74 +25,59 @@ class ChangePasswordView(GenericAPIView):
             old_password = serializer.validated_data['old_password']
             new_password = serializer.validated_data['new_password']
 
-            stored_password, salt = AccountManagementDBUtils.get_user_stored_password_and_salt(user_id=user_id)
-
-            hashed_old_password = hash_password(old_password, salt)
-
-            if hashed_old_password == stored_password:
-
-                AccountManagementDBUtils.update_password(new_password=new_password, user_id=user_id)
-
-                return Response(response.api_result, status=status.HTTP_200_OK)
-
-            raise WrongPasswordError()
+            user = User.objects.get(id=user_id)
+            if not user.check_password(old_password):
+                response.api_result["error_message"] = "رمز عبور قبلی اشتباه است"
+                return Response(response.api_result, status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(new_password)
+            user.save()
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserProfileView(GenericAPIView):
+    serializer_class = UserProfileSerializer
 
     @login_required
     def get(self, request, user_id, role_id, *args, **kwargs):
         response = APIResult()
-        username, email = AccountManagementDBUtils.get_username_email(user_id=user_id)
-
-        response.api_result['data'] = {'email': email, 'username': username}
+        user = User.objects.get(id=user_id)
+        serializer = self.get_serializer(user)
+        response.api_result["data"] = serializer.data
         return Response(response.api_result, status=status.HTTP_200_OK)
 
 
 class UserBookMarksView(GenericAPIView):
+    serializer_class = UserBookmarkSerializer
 
     @login_required
-    def get(self, request, user_id, role_id, *args, **kwargs):
+    def get(self, request, user_id, *args, **kwargs):
+        user = User.objects.prefetch_related(
+            'bookmarked_books__publisher',
+            'bookmarked_books__language'
+        ).get(pk=user_id)
+        bookmarked_books = user.bookmarked_books.filter(is_delete=False)
+        serializer = self.get_serializer(bookmarked_books, many=True)
         response = APIResult()
-        user_bookmarks = AccountManagementDBUtils.get_user_bookmarks(user_id=user_id)
-
-        response.api_result['data'] = user_bookmarks
+        response.api_result['data'] = serializer.data
         return Response(response.api_result, status=status.HTTP_200_OK)
-
-    @login_required
-    def post(self, request, user_id, role_id, *args, **kwargs):
-        response = APIResult()
-        serializer = UserBookmarkSerializer(data=request.data)
-
-        if serializer.is_valid():
-            book_id = serializer.validated_data['book_id']
-            AccountManagementDBUtils.add_book_to_user_bookmarks(user_id=user_id, book_id=book_id)
-
-            return Response(response.api_result, status=status.HTTP_200_OK)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GetUserBooksView(GenericAPIView):
+    serializer_class = UserBookSerializer
 
     @login_required
     def get(self, request, user_id, role_id, *args, **kwargs):
         response = APIResult()
-        user_books = AccountManagementDBUtils.get_user_books(user_id=user_id)
-        response.api_result['data'] = user_books
-        return Response(response.api_result, status=status.HTTP_200_OK)
+        user_books = Book.objects.filter(
+            users__id=user_id,
+            is_delete=False
+        ).select_related(
+            'publisher', 'language'
+        )
+        serializer = self.get_serializer(user_books, many=True)
+        response.api_result['data'] = serializer.data
 
-
-class GetUserWalletHistoryView(GenericAPIView):
-    pagination_class = PageNumberPagination
-
-    @login_required
-    def get(self, request, user_id, role_id, *args, **kwargs):
-        response = APIResult()
-
-        response.api_result['data'] = AccountManagementDBUtils.get_user_wallet_history(self, user_id, request)
         return Response(response.api_result, status=status.HTTP_200_OK)
 
 
@@ -98,7 +87,39 @@ class DeleteUserBookMarkView(GenericAPIView):
     def delete(self, request, user_id, role_id, *args, **kwargs):
         response = APIResult()
         book_id = kwargs.get('book_id')
-        AccountManagementDBUtils.delete_user_bookmark(user_id=user_id, book_id=book_id)
+        user_bookmark = UserBookmark.objects.filter(
+            Q(user_id=user_id) & Q(book_id=book_id)
+        )
+        user_bookmark.delete()
+        return Response(response.api_result, status=status.HTTP_200_OK)
+
+
+class GetUserWalletHistoryView(GenericAPIView):
+    pagination_class = PageNumberPagination
+
+    @login_required
+    def get(self, request, user_id, role_id, *args, **kwargs):
+        response = APIResult()
+        wallet_actions = WalletAction.objects.filter(
+            user_id=user_id,
+            is_successful=True
+        ).select_related('action_type').annotate(
+            actiontype=F('action_type__action_type')
+        ).values(
+            'id', 'actiontype', 'amount', 'is_successful', 'description', 'created_date'
+        ).order_by('created_date')
+
+        paginator = WalletActionPagination()
+        paginated_results = paginator.paginate_queryset(wallet_actions, request)
+
+        data = {
+            "page_size": paginator.page_size,
+            "page_index": paginator.page.number,
+            "count": paginator.page.paginator.num_pages,
+            "data": list(paginated_results)
+        }
+
+        response.api_result["data"] = data
 
         return Response(response.api_result, status=status.HTTP_200_OK)
 
@@ -109,9 +130,27 @@ class UserWalletBalance(GenericAPIView):
     def get(self, request, user_id, role_id, *args, **kwargs):
         response = APIResult()
 
-        total_balance = AccountManagementDBUtils.get_total_successful_amount(user_id)
+        totals = WalletAction.objects.filter(
+            user_id=user_id,
+            is_successful=True
+        ).aggregate(
+            total_deposit=Sum(Case(
+                When(action_type_id=1, then='amount'),
+                default=Value(0),
+                output_field=IntegerField()
+            )),
+            total_withdraw=Sum(Case(
+                When(action_type_id=2, then='amount'),
+                default=Value(0),
+                output_field=IntegerField()
+            ))
+        )
+        total_deposit = totals['total_deposit'] if totals['total_deposit'] is not None else 0.0
+        total_withdraw = totals['total_withdraw'] if totals['total_withdraw'] is not None else 0.0
 
-        response.api_result['data'] = total_balance
+        total_amount = total_deposit - total_withdraw
+
+        response.api_result["data"] = total_amount
 
         return Response(response.api_result, status=status.HTTP_200_OK)
 
