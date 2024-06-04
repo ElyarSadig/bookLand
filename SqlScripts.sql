@@ -90,7 +90,6 @@ CREATE TABLE IF NOT EXISTS user_bookmarks (
     book_id INTEGER REFERENCES books(id),
     user_id INTEGER REFERENCES users(id),
     added_time TIMESTAMP,
-    is_delete BOOLEAN,
     CONSTRAINT unique_user_bookmark UNIQUE (user_id, book_id)
 );
 
