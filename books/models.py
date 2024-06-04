@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db.models import Avg, Count
 
 
 class Category(models.Model):
@@ -58,6 +59,14 @@ class Book(models.Model):
     users = models.ManyToManyField(User, through='UserBook', related_name='bought_books')
     bookmarks = models.ManyToManyField(User, through='UserBookmark', related_name='bookmarked_books')
 
+    @property
+    def review_average(self):
+        return self.reviews.aggregate(average=Avg('rating'))['average']
+
+    @property
+    def review_count(self):
+        return self.reviews.aggregate(count=Count('rating'))['count']
+
     def __str__(self):
         return self.name
 
@@ -108,7 +117,6 @@ class UserBookmark(models.Model):
     book = models.ForeignKey('Book', on_delete=models.CASCADE, related_name='book_bookmarks')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_bookmarks')
     added_time = models.DateTimeField(auto_now_add=True)
-    is_delete = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'user_bookmarks'
