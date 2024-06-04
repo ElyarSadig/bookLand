@@ -1,7 +1,6 @@
 import uuid
 import requests
 from decouple import config
-from .exceptions import InvalidFileFormatError, FileUploadFailedError
 
 
 def generate_uuid():
