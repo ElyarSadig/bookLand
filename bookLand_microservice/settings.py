@@ -60,6 +60,8 @@ INSTALLED_APPS = [
     "corsheaders",
 ]
 
+AUTH_USER_MODEL = 'users.User'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -99,8 +101,8 @@ WSGI_APPLICATION = 'bookLand_microservice.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'book_land_db',
-        'USER': 'root',
+        'NAME': 'bookLand_db',
+        'USER': 'admin',
         'PASSWORD': 'password',
         'HOST': config('DB_HOST', default='localhost'),
         'PORT': '5432',
@@ -132,7 +134,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tehran'
 
 USE_I18N = True
 
