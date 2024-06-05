@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS languages (
 -- Book table
 CREATE TABLE IF NOT EXISTS books (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),      -- Publisher
+    publisher_id INTEGER REFERENCES users(id),      -- Publisher
     book_name VARCHAR(255) NOT NULL,
     author_name VARCHAR(255) NOT NULL,
     translator_name VARCHAR(255),
