@@ -43,6 +43,10 @@ class User(AbstractUser):
 
     class Meta:
         db_table = 'users'
+        indexes = [
+            models.Index(fields=['username'], name='username_idx'),
+            models.Index(fields=['email'], name='email_idx'),
+        ]
 
 
 class UserActivityCode(models.Model):
@@ -56,6 +60,10 @@ class UserActivityCode(models.Model):
 
     class Meta:
         db_table = 'user_activity_codes'
+        indexes = [
+            models.Index(fields=['email'], name='user_activity_email_idx'),
+            models.Index(fields=['activation_code'], name='activation_code_idx'),
+        ]
 
 
 class Role(models.Model):
@@ -76,6 +84,9 @@ class UserRole(models.Model):
     class Meta:
         unique_together = ('user', 'role')
         db_table = 'user_roles'
+        indexes = [
+            models.Index(fields=['user', 'role'], name='user_role_idx'),
+        ]
 
     def __str__(self):
         return f'{self.user.username} - {self.role.role}'

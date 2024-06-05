@@ -38,6 +38,9 @@ class Review(models.Model):
 
     class Meta:
         db_table = 'reviews'
+        indexes = [
+            models.Index(fields=['user', 'book'], name='review_user_book_idx'),
+        ]
 
 
 class Book(models.Model):
@@ -72,6 +75,11 @@ class Book(models.Model):
 
     class Meta:
         db_table = 'books'
+        indexes = [
+            models.Index(fields=["publisher"], name="publisher_book_idx"),
+            models.Index(fields=["name"], name="name_book_idx"),
+            models.Index(fields=["author_name"], name="author_name_idx")
+        ]
 
 
 class BookCategory(models.Model):
@@ -84,6 +92,9 @@ class BookCategory(models.Model):
 
     class Meta:
         db_table = 'book_categories'
+        indexes = [
+            models.Index(fields=['book', 'category'], name='book_category_idx'),
+        ]
 
 
 class Comment(models.Model):
@@ -98,6 +109,9 @@ class Comment(models.Model):
 
     class Meta:
         db_table = 'comments'
+        indexes = [
+            models.Index(fields=['book', 'user'], name='comment_book_user_idx'),
+        ]
 
 
 class UserBook(models.Model):
@@ -107,6 +121,9 @@ class UserBook(models.Model):
 
     class Meta:
         db_table = 'user_books'
+        indexes = [
+            models.Index(fields=['user', 'book'], name='user_book_idx'),
+        ]
 
     @classmethod
     def has_user_bought_book(cls, user_id, book_id):
@@ -121,3 +138,6 @@ class UserBookmark(models.Model):
     class Meta:
         db_table = 'user_bookmarks'
         unique_together = ('user', 'book')
+        indexes = [
+            models.Index(fields=['user', 'book'], name='user_bookmark_book_user_idx'),
+        ]

@@ -25,6 +25,9 @@ class WalletAction(models.Model):
 
     class Meta:
         db_table = "wallet_actions"
+        indexes = [
+            models.Index(fields=['user', 'action_type'], name='user_action_type_idx'),
+        ]
 
 
 class Discount(models.Model):
@@ -51,3 +54,6 @@ class UserDiscount(models.Model):
 
     class Meta:
         db_table = 'user_discounts'
+        indexes = [
+            models.Index(fields=['user', 'discount'], name='user_discount_idx'),
+        ]
