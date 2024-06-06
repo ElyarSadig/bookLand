@@ -25,10 +25,6 @@ class User(AbstractUser):
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = []
 
-    @property
-    def is_staff(self):
-        return self.is_superuser
-
     @classmethod
     def update_publisher_files(cls, user_id, publications_image, identity_image):
         user = cls.objects.get(pk=user_id)
