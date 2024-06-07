@@ -13,8 +13,8 @@ class WalletActionType(models.Model):
 
 
 class WalletAction(models.Model):
-    action_type = models.ForeignKey(WalletActionType, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    action_type = models.ForeignKey(WalletActionType, on_delete=models.CASCADE, db_index=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, db_index=False)
     amount = models.IntegerField()
     is_successful = models.BooleanField(default=False)
     description = models.TextField()
@@ -54,6 +54,3 @@ class UserDiscount(models.Model):
 
     class Meta:
         db_table = 'user_discounts'
-        indexes = [
-            models.Index(fields=['user', 'discount'], name='user_discount_idx'),
-        ]
