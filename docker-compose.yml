@@ -27,7 +27,7 @@ services:
     restart: on-failure
     build:
       context: .
-      dockerfile: .
+      dockerfile: ./Dockerfile
     environment:
       - DB_HOST=postgres-db
       - FILE_SERVER=http://file-server:8080
@@ -37,7 +37,6 @@ services:
       - "8000:8000"
     volumes:
       - ./:/app
-    command: ./entrypoint.sh
     depends_on:
       postgres-db:
         condition: service_healthy
