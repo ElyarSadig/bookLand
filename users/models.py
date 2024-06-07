@@ -80,9 +80,6 @@ class UserRole(models.Model):
     class Meta:
         unique_together = ('user', 'role')
         db_table = 'user_roles'
-        indexes = [
-            models.Index(fields=['user', 'role'], name='user_role_idx'),
-        ]
 
     def __str__(self):
         return f'{self.user.username} - {self.role.role}'
