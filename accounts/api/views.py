@@ -27,10 +27,11 @@ class ChangePasswordView(GenericAPIView):
 
             user = User.objects.get(id=user_id)
             if not user.check_password(old_password):
-                response.api_result["error_message"] = "رمز عبور قبلی اشتباه است"
+                response.api_result["result"]["error_message"] = "رمز عبور قبلی اشتباه است"
                 return Response(response.api_result, status=status.HTTP_400_BAD_REQUEST)
             user.set_password(new_password)
             user.save()
+            return Response(response.api_result, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

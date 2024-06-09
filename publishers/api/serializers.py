@@ -27,7 +27,6 @@ class PasswordChangeSerializer(serializers.Serializer):
         if len(error_message) != 0:
             raise serializers.ValidationError({
                 "result": {
-                    "error_code": "InvalidPassword",
                     "error_message": error_message,
                     "errors": ""
                 },

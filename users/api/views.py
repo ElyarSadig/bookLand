@@ -161,8 +161,8 @@ class UserLoginView(GenericAPIView):
             if not user.is_active:
                 return error_response(response.api_result, error_message="کاربر مسدود شده است", status_code=status.HTTP_400_BAD_REQUEST)
 
-            role = UserRole.objects.get(user=user)
-            token = generate_jwt_token(user.id, role.id)
+            user_role = UserRole.objects.get(user=user)
+            token = generate_jwt_token(user.id, user_role.role.id)
 
             response.api_result['data'] = token
 

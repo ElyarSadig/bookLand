@@ -2,15 +2,14 @@ from rest_framework.generics import GenericAPIView
 from .serializers import PasswordChangeSerializer, UpdatePublisherProfileSerializer, CreateBookSerializer
 from .jwt_auth import login_required
 from users.api.api_result import APIResult
-from accounts.api.exceptions import *
-from .db_utils import AccountManagementDBUtils, hash_password
+from users.models import User
+from .db_utils import AccountManagementDBUtils
 from rest_framework import status
 from rest_framework.response import Response
 
 
 class ChangePasswordView(GenericAPIView):
     serializer_class = PasswordChangeSerializer
-
 
     @login_required
     def post(self, request, user_id, role_id, *args, **kwargs):
@@ -21,16 +20,13 @@ class ChangePasswordView(GenericAPIView):
             old_password = serializer.validated_data['old_password']
             new_password = serializer.validated_data['new_password']
 
-            stored_password, salt = AccountManagementDBUtils.get_user_stored_password_and_salt(user_id=user_id)
-
-            hashed_old_password = hash_password(old_password, salt)
-
-            if hashed_old_password == stored_password:
-                AccountManagementDBUtils.update_password(new_password=new_password, user_id=user_id)
-
-                return Response(response.api_result, status=status.HTTP_200_OK)
-
-            raise WrongPasswordError()
+            user = User.objects.get(id=user_id)
+            if not user.check_password(old_password):
+                response.api_result["result"]["error_message"] = "رمز عبور قبلی اشتباه است"
+                return Response(response.api_result, status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(new_password)
+            user.save()
+            return Response(response.api_result, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
