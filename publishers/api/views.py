@@ -1,11 +1,14 @@
 from rest_framework.generics import GenericAPIView
-from .serializers import PasswordChangeSerializer, UpdatePublisherProfileSerializer, CreateBookSerializer
+from .serializers import PasswordChangeSerializer, UpdatePublisherProfileSerializer, CreateBookSerializer, BookSerializer
 from .jwt_auth import login_required
 from users.api.api_result import APIResult
-from users.models import User
 from .db_utils import AccountManagementDBUtils
 from rest_framework import status
 from rest_framework.response import Response
+from books.models import Book
+from users.models import User
+from django.db.models import Count, Sum
+from django.db.models.functions import Coalesce
 
 
 class ChangePasswordView(GenericAPIView):
@@ -32,14 +35,29 @@ class ChangePasswordView(GenericAPIView):
 
 
 class PublisherBooksView(GenericAPIView):
-
+    serializer_class = BookSerializer
     @login_required
     def get(self, request, user_id, role_id, *args, **kwargs):
         response = APIResult()
 
-        data = AccountManagementDBUtils.get_books_with_sales_info(user_id)
+        publisher_books = Book.objects.filter(publisher_id=user_id).annotate(
+            count_of_sold=Coalesce(Count('user_books'), 0),
+            income=Coalesce(Sum('user_books__book__price'), 0)
+        ).values(
+            'id',
+            'name',
+            'author_name',
+            'translator_name',
+            'released_date',
+            'book_cover_image',
+            'price',
+            'number_of_pages',
+            'count_of_sold',
+            'income'
+        )
+        serialized = self.get_serializer(publisher_books, many=True)
 
-        response.api_result["data"] = data
+        response.api_result["data"] = serialized.data
 
         return Response(response.api_result, status=status.HTTP_200_OK)
 

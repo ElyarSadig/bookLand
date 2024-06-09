@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from users.api.validation_utils import is_password_valid
+from books.models import Book
 
 
 def validate_file_type(value):
@@ -14,6 +15,26 @@ def validate_pdf_file(value):
 
     if value.content_type not in allowed_types:
         raise serializers.ValidationError("Invalid file type. Only PDF files are allowed.")
+
+
+class BookSerializer(serializers.ModelSerializer):
+    count_of_sold = serializers.IntegerField()
+    income = serializers.IntegerField()
+
+    class Meta:
+        model = Book
+        fields = [
+            'id',
+            'name',
+            'author_name',
+            'translator_name',
+            'released_date',
+            'book_cover_image',
+            'price',
+            'number_of_pages',
+            'count_of_sold',
+            'income'
+        ]
 
 
 class PasswordChangeSerializer(serializers.Serializer):
