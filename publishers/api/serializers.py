@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from users.api.validation_utils import is_password_valid
 from books.models import Book
+from users.models import User
+from accounts.models import WalletAction
 
 
 def validate_file_type(value):
@@ -57,13 +59,6 @@ class PasswordChangeSerializer(serializers.Serializer):
         return attrs
 
 
-class UpdatePublisherProfileSerializer(serializers.Serializer):
-    address = serializers.CharField(required=False, default="")
-    phone_number2 = serializers.CharField(required=False, max_length=11, default="")
-    publications_image = serializers.CharField(required=False, default="")
-    card_number = serializers.CharField(required=False, default="", max_length=16, min_length=16)
-
-
 class CreateBookSerializer(serializers.Serializer):
     book_name = serializers.CharField(max_length=255)
     author_name = serializers.CharField(max_length=255)
@@ -79,3 +74,35 @@ class CreateBookSerializer(serializers.Serializer):
     book_original_file = serializers.FileField(allow_null=True, validators=[validate_pdf_file])
 
 
+class PublisherProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["username", "email", "phone_number", "phone_number2", "address", "identity_image", "card_number",
+                  "publications_name", "publications_image"]
+        extra_kwargs = {
+            'username': {'required': False, 'allow_blank': True, 'allow_null': True},
+            'phone_number2': {'required': False, 'allow_blank': True, 'allow_null': True},
+            'address': {'required': False, 'allow_blank': True, 'allow_null': True},
+            'card_number': {'required': False, 'allow_blank': True, 'allow_null': True},
+            'publications_image': {'required': False, 'allow_blank': True, 'allow_null': True}
+        }
+
+
+class WalletActionSerializer(serializers.ModelSerializer):
+    action_type = serializers.CharField(source='action_type.action_type', read_only=True)
+
+    class Meta:
+        model = WalletAction
+        fields = [
+            'id',
+            'action_type',
+            'amount',
+            'is_successful',
+            'description',
+            'created_date'
+        ]
+
+
+class WalletActionSummarySerializer(serializers.Serializer):
+    deposit = serializers.IntegerField()
+    withdraw = serializers.IntegerField()

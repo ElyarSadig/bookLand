@@ -1,5 +1,7 @@
 from rest_framework.generics import GenericAPIView
-from .serializers import PasswordChangeSerializer, UpdatePublisherProfileSerializer, CreateBookSerializer, BookSerializer
+from .serializers import PasswordChangeSerializer, \
+    CreateBookSerializer, BookSerializer, PublisherProfileSerializer, WalletActionSerializer, \
+    WalletActionSummarySerializer
 from .jwt_auth import login_required
 from users.api.api_result import APIResult
 from .db_utils import AccountManagementDBUtils
@@ -7,8 +9,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from books.models import Book
 from users.models import User
-from django.db.models import Count, Sum
+from django.db.models import Sum, Case, When, IntegerField, Count
 from django.db.models.functions import Coalesce
+from accounts.models import WalletAction
 
 
 class ChangePasswordView(GenericAPIView):
@@ -87,8 +90,10 @@ class PublisherBooksView(GenericAPIView):
         response = APIResult()
 
         book_id = kwargs.get('book_id')
-
-        AccountManagementDBUtils.delete_publisher_book(user_id, book_id)
+        book = Book.objects.filter(id=book_id, publisher_id=user_id).first()
+        if book is not None:
+            book.is_delete = True
+            book.save()
 
         return Response(response.api_result, status=status.HTTP_200_OK)
 
@@ -98,28 +103,28 @@ class PublisherProfileView(GenericAPIView):
     @login_required
     def get(self, request, user_id, role_id, *args, **kwargs):
         response = APIResult()
-
-        data = AccountManagementDBUtils.get_publisher_info(user_id)
-
-        response.api_result["data"] = data
-
+        user = User.objects.get(id=user_id)
+        serialized = PublisherProfileSerializer(user)
+        response.api_result["data"] = serialized.data
         return Response(response.api_result, status=status.HTTP_200_OK)
 
     @login_required
     def put(self, request, user_id, role_id, *args, **kwargs):
         response = APIResult()
+        user = User.objects.get(id=user_id)
 
-        serializer = UpdatePublisherProfileSerializer(data=request.data)
-
+        serializer = PublisherProfileSerializer(data=request.data)
         if serializer.is_valid():
-
-            address = serializer.validated_data["address"]
-            phone_number2 = serializer.validated_data["phone_number2"]
-            publications_image = serializer.validated_data["publications_image"]
-            card_number = serializer.validated_data['card_number']
-
-            AccountManagementDBUtils.update_publisher_profile(address, phone_number2, publications_image, card_number,
-                                                              user_id)
+            validated_data = serializer.validated_data
+            if 'address' in validated_data:
+                user.address = validated_data['address']
+            if 'phone_number2' in validated_data:
+                user.phone_number2 = validated_data['phone_number2']
+            if 'publications_image' in validated_data:
+                user.publications_image = validated_data['publications_image']
+            if 'card_number' in validated_data:
+                user.card_number = validated_data['card_number']
+            user.save()
 
             return Response(response.api_result, status=status.HTTP_200_OK)
 
@@ -131,10 +136,20 @@ class PublisherWalletHistory(GenericAPIView):
     @login_required
     def get(self, request, user_id, role_id, *args, **kwargs):
         response = APIResult()
+        wallet_actions = WalletAction.objects.filter(
+            user_id=user_id,
+            is_successful=True
+        ).select_related('action_type').values(
+            'id',
+            'action_type__action_type',
+            'amount',
+            'is_successful',
+            'description',
+            'created_date'
+        )
+        serializer = WalletActionSerializer(wallet_actions, many=True)
 
-        data = AccountManagementDBUtils.get_publisher_wallet_history(user_id)
-
-        response.api_result["data"] = data
+        response.api_result["data"] = serializer.data
 
         return Response(response.api_result, status=status.HTTP_200_OK)
 
@@ -144,10 +159,28 @@ class PublisherWalletBalanceView(GenericAPIView):
     @login_required
     def get(self, request, user_id, role_id, *args, **kwargs):
         response = APIResult()
+        summary = WalletAction.objects.filter(
+            user_id=user_id,
+            is_successful=True
+        ).aggregate(
+            deposit=Sum(
+                Case(
+                    When(action_type_id=1, then='amount'),
+                    default=0,
+                    output_field=IntegerField()
+                )
+            ),
+            withdraw=Sum(
+                Case(
+                    When(action_type_id=2, then='amount'),
+                    default=0,
+                    output_field=IntegerField()
+                )
+            )
+        )
 
-        data = AccountManagementDBUtils.get_publisher_wallet_balance(user_id)
-
-        response.api_result["data"] = data
+        serializer = WalletActionSummarySerializer(summary)
+        response.api_result["data"] = serializer.data
 
         return Response(response.api_result, status=status.HTTP_200_OK)
 
