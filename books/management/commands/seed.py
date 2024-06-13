@@ -104,7 +104,14 @@ class Command(BaseCommand):
                  phone_number="09214491849",
                  identity_image="http://localhost:8080/identities/demo-3.jpg",
                  card_number="6037997333763952",
-                 publications_image="http://localhost:8080/publications/demo-3.png")
+                 publications_image="http://localhost:8080/publications/demo-3.png"),
+
+            User(username="admin",
+                 email="admin@email.com",
+                 password=make_password("admin"),
+                 is_staff=True,
+                 is_superuser=True,
+                 is_active=True)
         ])
 
         # Insert data into UserRoles
