@@ -44,7 +44,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email_or_username\": \"Elyar\",\r\n    \"password\": \"password\"\r\n}",
+							"raw": "{\r\n    \"email_or_username\": \"KheyliSabz\",\r\n    \"password\": \"@Ely1380\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -531,6 +531,261 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "publisher",
+			"item": [
+				{
+					"name": "change-password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"old_password\": \"@Ely1380121\",\r\n    \"new_password\": \"@Ely1380\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/{{PUBLISHER}}/change-password",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"{{PUBLISHER}}",
+								"change-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get publisher books",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "delete publisher book",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/{{PUBLISHER}}/books/15",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"{{PUBLISHER}}",
+								"books",
+								"15"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "publisher profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/{{PUBLISHER}}/profile",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"{{PUBLISHER}}",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update publisher profile",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"address\": \"Tabriz Iran\",\r\n    \"phone_number2\": \"09214491645\",\r\n    \"card_number\": \"310433745785876\",\r\n    \"publications_image\": \"update image\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/{{PUBLISHER}}/profile",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"{{PUBLISHER}}",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "publisher wallet history",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/{{PUBLISHER}}/wallet-history",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"{{PUBLISHER}}",
+								"wallet-history"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "publisher wallet balance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/{{PUBLISHER}}/wallet-balance",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"{{PUBLISHER}}",
+								"wallet-balance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create book",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "book 1",
+									"type": "text"
+								},
+								{
+									"key": "author_name",
+									"value": "author 1",
+									"type": "text"
+								},
+								{
+									"key": "translator_name",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "released_date",
+									"value": "1402",
+									"type": "text"
+								},
+								{
+									"key": "book_cover_image",
+									"type": "file",
+									"src": "/C:/Users/Elyar/Desktop/8.jpg"
+								},
+								{
+									"key": "description",
+									"value": "Here is a sample description",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "150000",
+									"type": "text"
+								},
+								{
+									"key": "number_of_pages",
+									"value": "453",
+									"type": "text"
+								},
+								{
+									"key": "language_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "category_id",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "demo_file",
+									"type": "file",
+									"src": "/C:/Users/Elyar/Desktop/putting the you in CPU.pdf"
+								},
+								{
+									"key": "original_file",
+									"type": "file",
+									"src": "/C:/Users/Elyar/Desktop/putting the you in CPU.pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/{{PUBLISHER}}/books",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"{{PUBLISHER}}",
+								"books"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{PUBLISHER_TOKEN}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
 		}
 	],
 	"event": [
@@ -577,8 +832,18 @@
 			"type": "string"
 		},
 		{
+			"key": "PUBLISHER",
+			"value": "api/publisher",
+			"type": "string"
+		},
+		{
 			"key": "USER_TOKEN",
 			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJyb2xlX2lkIjoyLCJleHAiOjE3MTc0OTI0NTN9.bOTlrQqHTwl9K8JlhR8A660S5x-KezY8QUZpOLiAJXw",
+			"type": "string"
+		},
+		{
+			"key": "PUBLISHER_TOKEN",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0LCJyb2xlX2lkIjoxLCJleHAiOjE3MTgyOTYzMDl9.KgMuiw4Dn1BjrfwP8HLnaHGmv6Yit2jju4VFOExU05s",
 			"type": "string"
 		}
 	]
