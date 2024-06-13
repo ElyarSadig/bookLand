@@ -33,7 +33,7 @@ def upload_to_file_server(file, postfix):
         file_server_url + "/upload" + postfix,
         files=files,
         headers={'Authorization': auth_token},
-        timeout=10
+        timeout=1
     )
 
     if response.status_code == 200:

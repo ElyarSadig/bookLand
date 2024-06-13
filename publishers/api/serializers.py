@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from users.api.validation_utils import is_password_valid
-from books.models import Book
 from users.models import User
 from accounts.models import WalletAction
+from books.models import Book, BookCategory
+from django.db import transaction
 
 
 def validate_file_type(value):
@@ -59,19 +60,35 @@ class PasswordChangeSerializer(serializers.Serializer):
         return attrs
 
 
-class CreateBookSerializer(serializers.Serializer):
-    book_name = serializers.CharField(max_length=255)
-    author_name = serializers.CharField(max_length=255)
-    translator_name = serializers.CharField(max_length=255, required=False, allow_blank=True)
-    released_date = serializers.IntegerField()
-    book_cover_image = serializers.FileField(validators=[validate_file_type])
-    price = serializers.DecimalField(max_digits=10, decimal_places=2)
-    description = serializers.CharField(allow_blank=True, required=False)
-    number_of_pages = serializers.IntegerField()
-    language_id = serializers.IntegerField()
-    category_id = serializers.IntegerField()
-    book_demo_file = serializers.FileField(allow_null=True, validators=[validate_pdf_file])
-    book_original_file = serializers.FileField(allow_null=True, validators=[validate_pdf_file])
+class CreateBookSerializer(serializers.ModelSerializer):
+    category_id = serializers.IntegerField(write_only=True)
+    language_id = serializers.IntegerField(write_only=True)
+    publisher_id = serializers.IntegerField(required=False, write_only=True)
+    book_cover_image = serializers.FileField(write_only=True, validators=[validate_file_type])
+    demo_file = serializers.FileField(write_only=True, validators=[validate_pdf_file])
+    original_file = serializers.FileField(write_only=True, validators=[validate_pdf_file])
+
+    class Meta:
+        model = Book
+        fields = [
+            'name', 'author_name', 'publisher_id', 'translator_name', 'released_date',
+            'book_cover_image', 'price', 'description', 'number_of_pages',
+            'language_id', 'category_id', 'demo_file', 'original_file'
+        ]
+
+    def create(self, validated_data):
+        category_id = validated_data.pop('category_id')
+        with transaction.atomic():
+            book = Book.objects.create(**validated_data, is_delete=True)
+            BookCategory.objects.create(book=book, category_id=category_id, is_delete=False)
+            WalletAction.objects.create(
+                action_type_id=2,
+                user_id=validated_data["publisher_id"],
+                amount=5000,
+                is_successful=True,
+                description=f'ایجاد کتاب {validated_data["name"]}'
+            )
+        return book
 
 
 class PublisherProfileSerializer(serializers.ModelSerializer):

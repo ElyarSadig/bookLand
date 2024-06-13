@@ -4,7 +4,6 @@ from .serializers import PasswordChangeSerializer, \
     WalletActionSummarySerializer
 from .jwt_auth import login_required
 from users.api.api_result import APIResult
-from .db_utils import AccountManagementDBUtils
 from rest_framework import status
 from rest_framework.response import Response
 from books.models import Book
@@ -12,6 +11,7 @@ from users.models import User
 from django.db.models import Sum, Case, When, IntegerField, Count
 from django.db.models.functions import Coalesce
 from accounts.models import WalletAction
+from users.api.file_handler import process_and_upload_book, process_and_upload_book_cover_image
 
 
 class ChangePasswordView(GenericAPIView):
@@ -67,19 +67,44 @@ class PublisherBooksView(GenericAPIView):
     @login_required
     def post(self, request, user_id, role_id, *args, **kwargs):
         response = APIResult()
-        balance = AccountManagementDBUtils.get_total_successful_amount(user_id)
+        summary = WalletAction.objects.filter(
+            user_id=user_id,
+            is_successful=True
+        ).aggregate(
+            deposit=Sum(
+                Case(
+                    When(action_type_id=1, then='amount'),
+                    default=0,
+                    output_field=IntegerField()
+                )
+            ),
+            withdraw=Sum(
+                Case(
+                    When(action_type_id=2, then='amount'),
+                    default=0,
+                    output_field=IntegerField()
+                )
+            )
+        )
+        balance = summary["deposit"] - summary["withdraw"]
 
         if balance < 5000:
-            response.api_result["result"]["error_code"] = "NotEnoghBalanceError"
             response.api_result["result"]["error_message"] = "ناشر عزیز موجودی حساب شما برای ایجاد کتاب کافی نیست"
             return Response(response.api_result, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = CreateBookSerializer(data=request.data)
-
         if serializer.is_valid():
             validated_data = serializer.validated_data
+            try:
+                validated_data['book_cover_image'] = process_and_upload_book_cover_image(request.data['book_cover_image'])
+                validated_data['demo_file'] = process_and_upload_book(request.data['demo_file'])
+                validated_data['original_file'] = process_and_upload_book(request.data['original_file'])
+                validated_data["publisher_id"] = user_id
+            except:
+                response.api_result["result"]["error_message"] = "خطایی در برقراری ارتباط با فایل سرور وجود دارد"
+                return Response(response.api_result, status=status.HTTP_424_FAILED_DEPENDENCY)
 
-            AccountManagementDBUtils.create_book(user_id, validated_data)
+            serializer.save()
 
             return Response(response.api_result, status=status.HTTP_201_CREATED)
 
