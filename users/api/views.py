@@ -215,7 +215,7 @@ class VerifyEmailCodeView(GenericAPIView):
                                       status_code=status.HTTP_400_BAD_REQUEST)
 
             current_datetime = timezone.now()
-            expire_date = activation_code.created_date + activation_code.validity_duration
+            expire_date = user_activity_code.created_date + user_activity_code.validity_duration
             if current_datetime > expire_date:
                 return error_response(response.api_result,
                                       error_message="به علت تاخیر زیاد دسترسی وجود ندارد. دوباره امتحان کنید",
