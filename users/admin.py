@@ -98,7 +98,7 @@ class RoleAdmin(admin.ModelAdmin):
 
 
 class UserActivityCodeAdmin(admin.ModelAdmin):
-    list_display = ('email', 'activation_code', 'created_date_time', 'validity_duration')
+    list_display = ('email', 'activation_code', 'created_date', 'validity_duration')
     search_fields = ('email', 'activation_code')
     list_filter = ('created_date', 'validity_duration')
 
