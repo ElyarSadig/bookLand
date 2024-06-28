@@ -36,7 +36,7 @@ class UserAdmin(admin.ModelAdmin):
     form = UserAdminForm
 
     search_fields = ['username', 'email']
-    list_filter = ['is_active', 'is_publisher', 'is_confirm', 'date_joined']
+    list_filter = ['is_active', 'is_publisher', 'is_confirm', 'date_joined', 'is_staff']
 
     def save_model(self, request, obj, form, change):
 
@@ -46,11 +46,11 @@ class UserAdmin(admin.ModelAdmin):
 
         if obj.is_publisher and (is_publisher_changed or not change):
             publisher_role, created = Role.objects.get_or_create(role='Publisher')
-            user_role, created = UserRole.objects.get_or_create(user=obj, role=publisher_role)
+            UserRole.objects.get_or_create(user=obj, role=publisher_role)
         elif not obj.is_publisher and (is_publisher_changed or not change):
 
             customer_role, created = Role.objects.get_or_create(role='Customer')
-            user_role, created = UserRole.objects.get_or_create(user=obj, role=customer_role)
+            UserRole.objects.get_or_create(user=obj, role=customer_role)
 
         if form.cleaned_data['publications_image_upload']:
             response_publications = process_and_upload_publications_image(form.cleaned_data['publications_image_upload'])
@@ -88,8 +88,8 @@ class UserRoleAdmin(admin.ModelAdmin):
     role_role.admin_order_field = 'role__role'
     role_role.short_description = 'Role Role'
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+    # def has_delete_permission(self, request, obj=None):
+    #     return False
 
 
 class RoleAdmin(admin.ModelAdmin):
