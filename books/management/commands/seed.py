@@ -426,18 +426,20 @@ class Command(BaseCommand):
 
         # Seed data for WalletAction
         WalletAction.objects.bulk_create([
-            WalletAction(action_type_id=1, user_id=1, amount=30000, is_successful=True, description='شارژ ۳۰۰۰۰ تومان',
-                         created_date='2023-01-09'),
-            WalletAction(action_type_id=2, user_id=1, amount=30000, is_successful=True, description='خرید کتاب نبرد من',
-                         created_date='2023-01-10'),
-            WalletAction(action_type_id=1, user_id=1, amount=50000, is_successful=True, description='شارژ ۵۰۰۰۰ تومان',
-                         created_date='2023-01-15'),
+            WalletAction(action_type_id=1, user_id=1, amount=30000, is_successful=True, description='شارژ ۳۰۰۰۰ تومان'),
+            WalletAction(action_type_id=2, user_id=1, amount=30000, is_successful=True, description='خرید کتاب نبرد من'),
+            WalletAction(action_type_id=1, user_id=1, amount=50000, is_successful=True, description='شارژ ۵۰۰۰۰ تومان'),
             WalletAction(action_type_id=2, user_id=2, amount=25000, is_successful=True,
-                         description='خرید فرشته عشق بال های مقوایی دارد', created_date='2023-01-15'),
-            WalletAction(action_type_id=1, user_id=2, amount=44900, is_successful=True, description='شارژ ۴۴۹۰۰',
-                         created_date='2023-01-14'),
+                         description='خرید فرشته عشق بال های مقوایی دارد'),
+            WalletAction(action_type_id=1, user_id=2, amount=44900, is_successful=True, description='شارژ ۴۴۹۰۰'),
             WalletAction(action_type_id=2, user_id=2, amount=19900, is_successful=True,
-                         description='خرید در حسرت فرشته', created_date='2023-01-16'),
+                         description='خرید در حسرت فرشته'),
+            WalletAction(action_type_id=2, user_id=4, amount=5000, is_successful=True, description="ایجاد کتاب"),
+            WalletAction(action_type_id=1, user_id=4, amount=30000, is_successful=True, description="واریز 30000 تومان"),
+            WalletAction(action_type_id=1, user_id=4, amount=10000, is_successful=True, description="واریز 10000 تومان"),
+            WalletAction(action_type_id=2, user_id=5, amount=5000, is_successful=True, description="ایجاد کتاب"),
+            WalletAction(action_type_id=1, user_id=5, amount=100000, is_successful=True, description="واریز 100000 هزار تومان"),
+            WalletAction(action_type_id=1, user_id=6, amount=45000, is_successful=True, description="واریز 45000 تومان")
         ])
 
         # Seed data for Discounts
