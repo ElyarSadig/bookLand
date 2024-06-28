@@ -54,6 +54,7 @@ class PublisherBooksView(GenericAPIView):
             'released_date',
             'book_cover_image',
             'price',
+            'is_delete',
             'number_of_pages',
             'count_of_sold',
             'income'
