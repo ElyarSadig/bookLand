@@ -34,6 +34,7 @@ class BookSerializer(serializers.ModelSerializer):
             'released_date',
             'book_cover_image',
             'price',
+            'is_delete',
             'number_of_pages',
             'count_of_sold',
             'income'
@@ -81,12 +82,13 @@ class CreateBookSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             book = Book.objects.create(**validated_data, is_delete=True)
             BookCategory.objects.create(book=book, category_id=category_id, is_delete=False)
+            description = validated_data["name"] + " " + "ایجاد کتاب"
             WalletAction.objects.create(
                 action_type_id=2,
                 user_id=validated_data["publisher_id"],
                 amount=5000,
                 is_successful=True,
-                description=f'ایجاد کتاب {validated_data["name"]}'
+                description=description
             )
         return book
 
@@ -121,5 +123,5 @@ class WalletActionSerializer(serializers.ModelSerializer):
 
 
 class WalletActionSummarySerializer(serializers.Serializer):
-    deposit = serializers.IntegerField()
-    withdraw = serializers.IntegerField()
+    deposit = serializers.IntegerField(default=0)
+    withdraw = serializers.IntegerField(default=0)
