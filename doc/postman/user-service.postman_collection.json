@@ -44,7 +44,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email_or_username\": \"KheyliSabz\",\r\n    \"password\": \"@Ely1380\"\r\n}",
+							"raw": "{\r\n    \"email_or_username\": \"KheyliSabz\",\r\n    \"password\": \"password\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -566,7 +566,17 @@
 					"name": "get publisher books",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/{{PUBLISHER}}/books",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"{{PUBLISHER}}",
+								"books"
+							]
+						}
 					},
 					"response": []
 				},
@@ -576,14 +586,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/{{PUBLISHER}}/books/15",
+							"raw": "{{BASE_URL}}/{{PUBLISHER}}/books/1",
 							"host": [
 								"{{BASE_URL}}"
 							],
 							"path": [
 								"{{PUBLISHER}}",
 								"books",
-								"15"
+								"1"
 							]
 						}
 					},
@@ -680,12 +690,12 @@
 							"formdata": [
 								{
 									"key": "name",
-									"value": "book 1",
+									"value": "book name from sana",
 									"type": "text"
 								},
 								{
 									"key": "author_name",
-									"value": "author 1",
+									"value": "author name test",
 									"type": "text"
 								},
 								{
@@ -701,7 +711,10 @@
 								{
 									"key": "book_cover_image",
 									"type": "file",
-									"src": "/C:/Users/Elyar/Desktop/8.jpg"
+									"src": [
+										"/C:/Users/Elyar/Desktop/8.jpg",
+										"/C:/wallpaper/5.jpg"
+									]
 								},
 								{
 									"key": "description",
@@ -731,12 +744,18 @@
 								{
 									"key": "demo_file",
 									"type": "file",
-									"src": "/C:/Users/Elyar/Desktop/putting the you in CPU.pdf"
+									"src": [
+										"/C:/Users/Elyar/Desktop/putting the you in CPU.pdf",
+										"/C:/Users/Elyar/Desktop/Books/Docker/The_Art_of_Docker_Streamline_App_Development_and_Deployment_with.pdf"
+									]
 								},
 								{
 									"key": "original_file",
 									"type": "file",
-									"src": "/C:/Users/Elyar/Desktop/putting the you in CPU.pdf"
+									"src": [
+										"/C:/Users/Elyar/Desktop/putting the you in CPU.pdf",
+										"/C:/Users/Elyar/Desktop/Books/Docker/The_Art_of_Docker_Streamline_App_Development_and_Deployment_with.pdf"
+									]
 								}
 							]
 						},
@@ -843,7 +862,7 @@
 		},
 		{
 			"key": "PUBLISHER_TOKEN",
-			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0LCJyb2xlX2lkIjoxLCJleHAiOjE3MTgyOTYzMDl9.KgMuiw4Dn1BjrfwP8HLnaHGmv6Yit2jju4VFOExU05s",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2LCJyb2xlX2lkIjoxLCJleHAiOjE3MTk1ODc5MDJ9.8zVxZurzduOwB-8wqucHSF3TbSsHS9xpj697nVsVUjE",
 			"type": "string"
 		}
 	]
