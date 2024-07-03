@@ -1,6 +1,6 @@
 from rest_framework.generics import GenericAPIView
 from .serializers import PasswordChangeSerializer, \
-    CreateBookSerializer, BookSerializer, PublisherProfileSerializer, WalletActionSerializer, \
+    CreateBookSerializer, BookSerializer, PublisherProfileSerializer, \
     WalletActionSummarySerializer
 from .jwt_auth import login_required
 from users.api.api_result import APIResult
@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from books.models import Book
 from users.models import User
-from django.db.models import Sum, Case, When, IntegerField, Count
+from django.db.models import Sum, Case, When, IntegerField, Count, F
 from django.db.models.functions import Coalesce
 from accounts.models import WalletAction
 from users.api.file_handler import process_and_upload_book, process_and_upload_book_cover_image
@@ -165,17 +165,13 @@ class PublisherWalletHistory(GenericAPIView):
         wallet_actions = WalletAction.objects.filter(
             user_id=user_id,
             is_successful=True
-        ).select_related('action_type').values(
-            'id',
-            'action_type__action_type',
-            'amount',
-            'is_successful',
-            'description',
-            'created_date'
-        )
-        serializer = WalletActionSerializer(wallet_actions, many=True)
+        ).select_related('action_type').annotate(
+            actiontype=F('action_type__action_type')
+        ).values(
+            'id', 'actiontype', 'amount', 'is_successful', 'description', 'created_date'
+        ).order_by('created_date')
 
-        response.api_result["data"] = serializer.data
+        response.api_result["data"] = wallet_actions
 
         return Response(response.api_result, status=status.HTTP_200_OK)
 

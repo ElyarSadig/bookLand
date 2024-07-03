@@ -107,21 +107,6 @@ class PublisherProfileSerializer(serializers.ModelSerializer):
         }
 
 
-class WalletActionSerializer(serializers.ModelSerializer):
-    action_type = serializers.CharField(source='action_type.action_type', read_only=True)
-
-    class Meta:
-        model = WalletAction
-        fields = [
-            'id',
-            'action_type',
-            'amount',
-            'is_successful',
-            'description',
-            'created_date'
-        ]
-
-
 class WalletActionSummarySerializer(serializers.Serializer):
     deposit = serializers.IntegerField(default=0)
     withdraw = serializers.IntegerField(default=0)
