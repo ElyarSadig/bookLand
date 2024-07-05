@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .jwt_auth import login_required
 from users.api.api_result import APIResult
-from .serializers import PasswordChangeSerializer, UserProfileSerializer
+from .serializers import PasswordChangeSerializer, UserProfileSerializer, AddUserBookmarkSerializer
 from rest_framework.pagination import PageNumberPagination
 from users.models import User
 from accounts.api.serializers import UserBookSerializer, UserBookmarkSerializer
@@ -62,6 +62,18 @@ class UserBookMarksView(GenericAPIView):
         response = APIResult()
         response.api_result['data'] = serializer.data
         return Response(response.api_result, status=status.HTTP_200_OK)
+
+    @login_required
+    def post(self, request, user_id, role_id, *args, **kwargs):
+        response = APIResult()
+        serializer = AddUserBookmarkSerializer(data=request.data)
+
+        if serializer.is_valid():
+            book_id = serializer.validated_data['book_id']
+            UserBookmark.objects.update_or_create(user_id=user_id, book_id=book_id)
+            return Response(response.api_result, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GetUserBooksView(GenericAPIView):

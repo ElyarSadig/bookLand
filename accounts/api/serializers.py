@@ -56,4 +56,6 @@ class UserBookmarkSerializer(serializers.ModelSerializer):
         ]
 
 
+class AddUserBookmarkSerializer(serializers.Serializer):
+    book_id = serializers.IntegerField()
 
