@@ -377,6 +377,39 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "add user bookmark",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJyb2xlX2lkIjoyLCJleHAiOjE3MjAxODEwNDR9.8JN52py2g67ksWi9Gqpb8gsQR2OxaJvTuXTuNwNabXU",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"book_id\": 2\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/{{USER}}/bookmarks",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"{{USER}}",
+								"bookmarks"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -443,14 +476,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/{{USER}}/bookmarks/12",
+							"raw": "{{BASE_URL}}/{{USER}}/bookmarks/2",
 							"host": [
 								"{{BASE_URL}}"
 							],
 							"path": [
 								"{{USER}}",
 								"bookmarks",
-								"12"
+								"2"
 							]
 						}
 					},
@@ -623,13 +656,29 @@
 						"method": "PUT",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"address\": \"Tabriz Iran\",\r\n    \"phone_number2\": \"09214491645\",\r\n    \"card_number\": \"310433745785876\",\r\n    \"publications_image\": \"update image\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "address",
+									"value": "Tabriz Iran",
+									"type": "text"
+								},
+								{
+									"key": "phone_number2",
+									"value": "09214491653",
+									"type": "text"
+								},
+								{
+									"key": "card_number",
+									"value": "61043374598745",
+									"type": "text"
+								},
+								{
+									"key": "publications_image",
+									"type": "file",
+									"src": "/C:/Users/Elyar/Pictures/Screenshots/Screenshot (5).png"
 								}
-							}
+							]
 						},
 						"url": {
 							"raw": "{{BASE_URL}}/{{PUBLISHER}}/profile",
@@ -857,12 +906,12 @@
 		},
 		{
 			"key": "USER_TOKEN",
-			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJyb2xlX2lkIjoyLCJleHAiOjE3MTc0OTI0NTN9.bOTlrQqHTwl9K8JlhR8A660S5x-KezY8QUZpOLiAJXw",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJyb2xlX2lkIjoyLCJleHAiOjE3MjAxODEwNDR9.8JN52py2g67ksWi9Gqpb8gsQR2OxaJvTuXTuNwNabXU",
 			"type": "string"
 		},
 		{
 			"key": "PUBLISHER_TOKEN",
-			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2LCJyb2xlX2lkIjoxLCJleHAiOjE3MTk1ODc5MDJ9.8zVxZurzduOwB-8wqucHSF3TbSsHS9xpj697nVsVUjE",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0LCJyb2xlX2lkIjoxLCJleHAiOjE3MjAxODE5NjB9.fJXomtkuoePGXZolppyulcbUFSk9gOvqiTtlO71loUA",
 			"type": "string"
 		}
 	]
