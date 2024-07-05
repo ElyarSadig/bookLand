@@ -106,6 +106,13 @@ class PublisherProfileSerializer(serializers.ModelSerializer):
             'publications_image': {'required': False, 'allow_blank': True, 'allow_null': True}
         }
 
+class UpdatePublisherProfileSerializer(serializers.Serializer):
+    username = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=255)
+    phone_number2 = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=255)
+    address = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=255)
+    card_number = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=255)
+    publications_image = serializers.FileField(write_only=True, validators=[validate_file_type])
+
 
 class WalletActionSummarySerializer(serializers.Serializer):
     deposit = serializers.IntegerField(default=0)

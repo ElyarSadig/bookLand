@@ -1,7 +1,7 @@
 from rest_framework.generics import GenericAPIView
 from .serializers import PasswordChangeSerializer, \
     CreateBookSerializer, BookSerializer, PublisherProfileSerializer, \
-    WalletActionSummarySerializer
+    WalletActionSummarySerializer, UpdatePublisherProfileSerializer
 from .jwt_auth import login_required
 from users.api.api_result import APIResult
 from rest_framework import status
@@ -11,7 +11,8 @@ from users.models import User
 from django.db.models import Sum, Case, When, IntegerField, Count, F
 from django.db.models.functions import Coalesce
 from accounts.models import WalletAction
-from users.api.file_handler import process_and_upload_book, process_and_upload_book_cover_image
+from users.api.file_handler import process_and_upload_book, process_and_upload_book_cover_image, \
+    process_and_upload_publications_image
 
 
 class ChangePasswordView(GenericAPIView):
@@ -139,7 +140,7 @@ class PublisherProfileView(GenericAPIView):
         response = APIResult()
         user = User.objects.get(id=user_id)
 
-        serializer = PublisherProfileSerializer(data=request.data)
+        serializer = UpdatePublisherProfileSerializer(data=request.data)
         if serializer.is_valid():
             validated_data = serializer.validated_data
             if 'address' in validated_data:
@@ -147,7 +148,7 @@ class PublisherProfileView(GenericAPIView):
             if 'phone_number2' in validated_data:
                 user.phone_number2 = validated_data['phone_number2']
             if 'publications_image' in validated_data:
-                user.publications_image = validated_data['publications_image']
+                user.publications_image = process_and_upload_publications_image(file_path=validated_data['publications_image'])
             if 'card_number' in validated_data:
                 user.card_number = validated_data['card_number']
             user.save()
