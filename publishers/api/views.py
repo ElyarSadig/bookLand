@@ -13,6 +13,7 @@ from django.db.models.functions import Coalesce
 from accounts.models import WalletAction
 from users.api.file_handler import process_and_upload_book, process_and_upload_book_cover_image, \
     process_and_upload_publications_image
+from publishers.api.email_utils import send_email_background_task
 
 
 class ChangePasswordView(GenericAPIView):
@@ -88,7 +89,15 @@ class PublisherBooksView(GenericAPIView):
                 )
             )
         )
-        balance = summary["deposit"] - summary["withdraw"]
+        deposit = 0
+        withdraw = 0
+        if summary["deposit"]:
+            deposit = summary["deposit"]
+
+        if summary["withdraw"]:
+            withdraw = summary["withdraw"]
+
+        balance = deposit - withdraw
 
         if balance < 5000:
             response.api_result["result"]["error_message"] = "ناشر عزیز موجودی حساب شما برای ایجاد کتاب کافی نیست"
@@ -107,6 +116,11 @@ class PublisherBooksView(GenericAPIView):
                 return Response(response.api_result, status=status.HTTP_424_FAILED_DEPENDENCY)
 
             serializer.save()
+
+            user = User.objects.get(id=user_id)
+            subject = "بررسی کتاب"
+            template = "publishers/publisher_book_submtted_email.html"
+            send_email_background_task(subject, template, validated_data["name"], user.email)
 
             return Response(response.api_result, status=status.HTTP_201_CREATED)
 
