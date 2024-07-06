@@ -53,8 +53,16 @@ class OriginalBookFileView(GenericAPIView):
     def get(self, request, user_id, role_id, *args, **kwargs):
         response = APIResult()
         book_id = kwargs.get('book_id')
+
+        book = Book.objects.filter(id=book_id).first()
+        if book and book.price == 0:
+            book = Book.objects.get(id=book_id)
+            response.api_result['data'] = book.original_file
+            return Response(response.api_result, status=status.HTTP_200_OK)
+
         if not UserBook.has_user_bought_book(user_id, book_id):
             return Response(response.api_result, status=status.HTTP_404_NOT_FOUND)
+
         book = Book.objects.get(id=book_id)
         response.api_result['data'] = book.original_file
         return Response(response.api_result, status=status.HTTP_200_OK)
